@@ -117,6 +117,18 @@ a{color:inherit;text-decoration:none}
      A tela e de ESCOLHA. Entao tudo serve a escolha: o selo encolhe, o
      robo do fundo apaga, e o que fica forte sao os quatro cartoes. */
   .capa{place-items:center;padding:clamp(20px,5svh,36px) 18px calc(clamp(20px,5svh,36px) + env(safe-area-inset-bottom,0px))}
+  /* A FAIXA PRETA DO TOPO
+     No celular a cena e vertical: o brilho estava no meio da tela e a
+     vinheta escurecia os 28% de cima. Resultado: uma tarja preta entre a
+     barra do Safari e o selo. O brilho sobe pra tras do selo e a vinheta
+     de cima quase some — o azul agora comeca na primeira linha. */
+  .camada{background-position:50% 32%}
+  .brilho{background:
+    radial-gradient(78% 42% at 50% 26%,rgba(30,139,255,.34),transparent 72%),
+    radial-gradient(60% 36% at 50% 62%,rgba(30,139,255,.13),transparent 75%)}
+  .vinheta{background:
+    radial-gradient(130% 85% at 50% 32%,transparent 40%,rgba(4,7,14,.8) 100%),
+    linear-gradient(180deg,rgba(4,7,14,.12),transparent 14%,rgba(4,7,14,.88))}
   .centro{width:min(100%,430px);margin:0;gap:clamp(12px,2.6svh,22px)}
 
   /* o mesmo robo ja esta dentro do selo; aqui atras ele e so atmosfera */
