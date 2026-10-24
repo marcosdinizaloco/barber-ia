@@ -45,6 +45,9 @@
 </div>
 
 <script>
+/* O mesmo /exec publico que os aplicativos ja chamam. Nao e segredo. */
+var API = 'https://script.google.com/macros/s/AKfycbwjH7c69qlBz58Cuy0c23Yq7kSC-4PpohEqQCpKUy4gAb6Q1Syzqp-hxVra00wRr7RhiQ/exec';
+
 (function(){
   var caminho = location.pathname.replace(/^\/+|\/+$/g, '');   // tira as barras das pontas
   var partes  = caminho.split('/');
@@ -57,8 +60,30 @@
     try { cru = decodeURIComponent(cru); } catch(e){}
     var slug = cru.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 60);
     if (slug){
-      location.replace('/painel-app-pwa/?b=' + encodeURIComponent(slug)
-                       + (location.search ? '&' + location.search.slice(1) : ''));
+      /* O painel escreve a saudacao a partir de ?nome=. O link curto nao
+         tem como carregar o nome dentro dele, entao perguntamos aqui,
+         rapido, e seguimos de qualquer jeito.
+
+         FALHA ABERTA, de proposito: se a API demorar, cair ou nao
+         conhecer o slug, o painel abre mesmo assim — so com o nome
+         feinho que ele ja mostrava. Painel que abre torto e melhor que
+         painel que nao abre. */
+      var extra = location.search ? '&' + location.search.slice(1) : '';
+      var ir = function(nome){
+        location.replace('/painel-app-pwa/?b=' + encodeURIComponent(slug)
+          + (nome ? '&nome=' + encodeURIComponent(nome) : '') + extra);
+      };
+
+      var pronto = false;
+      var seguir = function(nome){ if (!pronto){ pronto = true; ir(nome); } };
+      setTimeout(function(){ seguir(''); }, 1500);      // teto: 1,5 s e vai
+
+      try {
+        fetch(API + '?action=nome&b=' + encodeURIComponent(slug), { cache:'no-store' })
+          .then(function(r){ return r.json(); })
+          .then(function(j){ seguir(j && j.ok ? j.nome : ''); })
+          .catch(function(){ seguir(''); });
+      } catch(e){ seguir(''); }
       return;
     }
   }
