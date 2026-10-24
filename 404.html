@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Barber IA Pro</title>
+<!--
+  ROTA CURTA DO PAINEL  —  barber-ia.pro/p/<slug>
+
+  O GitHub Pages serve ESTE arquivo para qualquer caminho que nao existe
+  no repositorio. E so o que ele faz de diferente: antes mostrava a
+  pagina de erro padrao do GitHub, agora mostra esta.
+
+  Nenhuma pasta publicada mudou. Os 90 aplicativos sao pastas de
+  verdade, servidas normalmente, e nunca passam por aqui.
+
+  CUIDADO QUE VALE REGISTRAR: o GitHub Pages devolve este arquivo com
+  status HTTP 404, e nao 200. Isso e proposital e e o que mantem a
+  checagem de slug do cadastro funcionando — ela pergunta ao
+  barber-ia.pro se /<slug>/ existe e so considera ocupado quando vem
+  200. Se um dia alguem fizer esta pagina responder 200, o cadastro
+  passa a achar que TODO slug esta ocupado e para de criar conta.
+-->
+<style>
+  :root{--noite:#0B0D10;--giz:#EDEAE4;--giz-2:#A7A39B;--azul:#0097FD;--linha:#232A33}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--noite);color:var(--giz);
+    font:16px/1.55 Figtree,system-ui,-apple-system,"Segoe UI",sans-serif}
+  .meio{min-height:100%;display:grid;place-items:center;padding:24px;text-align:center}
+  h1{font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;font-weight:900;
+     text-transform:uppercase;font-size:clamp(30px,7vw,46px);line-height:.92;margin:0 0 10px}
+  h1 em{font-style:normal;color:var(--azul)}
+  p{color:var(--giz-2);margin:0 0 22px;max-width:40ch}
+  a.bt{display:inline-block;text-decoration:none;background:var(--azul);color:#021221;
+    border-radius:999px;padding:14px 26px;font-weight:700}
+  .carregando{color:var(--giz-2);font-size:14px}
+</style>
+</head>
+<body>
+<div class="meio">
+  <div id="caixa">
+    <p class="carregando">Abrindo…</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var caminho = location.pathname.replace(/^\/+|\/+$/g, '');   // tira as barras das pontas
+  var partes  = caminho.split('/');
+
+  /* /p/<slug>  ->  o painel daquela barbearia */
+  if (partes.length === 2 && partes[0].toLowerCase() === 'p' && partes[1]){
+    /* decodifica ANTES de limpar: sem isso um %20 vira "20" e o slug sai
+       errado em vez de sair limpo. */
+    var cru = partes[1];
+    try { cru = decodeURIComponent(cru); } catch(e){}
+    var slug = cru.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 60);
+    if (slug){
+      location.replace('/painel-app-pwa/?b=' + encodeURIComponent(slug)
+                       + (location.search ? '&' + location.search.slice(1) : ''));
+      return;
+    }
+  }
+
+  /* qualquer outro endereco errado: pagina honesta, sem redirecionar
+     ninguem para lugar nenhum. */
+  document.getElementById('caixa').innerHTML =
+      '<h1>Esse endereço <em>não existe</em>.</h1>'
+    + '<p>O link pode ter sido digitado errado ou ter mudado.</p>'
+    + '<a class="bt" href="/">Ir para o início</a>';
+})();
+</script>
+</body>
+</html>
