@@ -88,6 +88,28 @@ var API = 'https://script.google.com/macros/s/AKfycbwjH7c69qlBz58Cuy0c23Yq7kSC-4
     }
   }
 
+  /* /ag/<slug>  ->  a pagina publica de agendamento daquela barbearia.
+
+     Nao existe pasta "ag" no repositorio, entao TODO /ag/... cai aqui.
+     Os 90 aplicativos do Metodo A moram em pastas de verdade na raiz
+     (/<slug>/) e sao servidos direto pelo GitHub Pages — eles nunca
+     passam por este arquivo.
+
+     Nao conferimos aqui se o slug existe: a propria pagina de
+     agendamento precisa falar com a API de qualquer jeito, e e ela
+     quem diz "barbearia nao encontrada". Uma requisicao em vez de
+     duas, e a pessoa ve a resposta certa em vez de um 404 generico. */
+  if (partes.length === 2 && partes[0].toLowerCase() === 'ag' && partes[1]){
+    var cruA = partes[1];
+    try { cruA = decodeURIComponent(cruA); } catch(e){}
+    var slugA = cruA.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 60);
+    if (slugA){
+      location.replace('/agendar/?b=' + encodeURIComponent(slugA)
+                       + (location.search ? '&' + location.search.slice(1) : ''));
+      return;
+    }
+  }
+
   /* qualquer outro endereco errado: pagina honesta, sem redirecionar
      ninguem para lugar nenhum. */
   document.getElementById('caixa').innerHTML =
