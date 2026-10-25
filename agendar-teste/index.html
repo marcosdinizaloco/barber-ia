@@ -57,7 +57,7 @@ html[data-m="urbano"]{
   --m-eyebrow:.18em;
   --m-raio:16px; --m-raio-btn:12px; --m-raio-chip:10px;
   --m-borda:1px solid var(--m-linha); --m-sombra:0 12px 30px -22px #000;
-  --m-capa:168px; --m-logo-raio:14px; --m-opc-fundo:var(--m-superficie);
+  --m-capa:112px; --m-logo-raio:14px; --m-opc-fundo:var(--m-superficie);
   --m-cta-caixa:uppercase; --m-cta-tracking:.06em; --m-cta-peso:800;
 }
 /* ── MODELO A — LUXO CLASSICO ── */
@@ -73,7 +73,7 @@ html[data-m="luxo"]{
   --m-eyebrow:.3em;
   --m-raio:3px; --m-raio-btn:2px; --m-raio-chip:2px;
   --m-borda:1px solid var(--m-linha); --m-sombra:none;
-  --m-capa:196px; --m-logo-raio:50%; --m-opc-fundo:transparent;
+  --m-capa:132px; --m-logo-raio:50%; --m-opc-fundo:transparent;
   --m-cta-caixa:uppercase; --m-cta-tracking:.22em; --m-cta-peso:600;
 }
 /* ── MODELO C — MINIMALISTA PREMIUM ── */
@@ -118,23 +118,23 @@ html[data-m="urbano"],html[data-m="luxo"]{color-scheme:dark}
 html[data-m="minimal"] .capa{display:none}
 
 .topo{position:relative;display:flex;flex-direction:column;align-items:center;
-  text-align:center;gap:12px;padding:0 0 22px;margin-top:calc(var(--m-capa) * -0.34)}
-html[data-m="minimal"] .topo{margin-top:0;padding-top:26px;align-items:flex-start;text-align:left}
-.selo{width:84px;height:84px;border-radius:var(--m-logo-raio);flex:0 0 auto;
+  text-align:center;gap:9px;padding:0 0 15px;margin-top:calc(var(--m-capa) * -0.30)}
+html[data-m="minimal"] .topo{margin-top:0;padding-top:18px;align-items:flex-start;text-align:left}
+.selo{width:68px;height:68px;border-radius:var(--m-logo-raio);flex:0 0 auto;
   display:flex;align-items:center;justify-content:center;
   background:var(--m-superficie);border:1px solid var(--m-linha);
-  font:700 27px/1 var(--m-display);letter-spacing:.02em;color:var(--m-marca);
+  font:700 23px/1 var(--m-display);letter-spacing:.02em;color:var(--m-marca);
   box-shadow:var(--m-sombra);overflow:hidden}
 html[data-m="luxo"] .selo{border-color:var(--m-marca);
   box-shadow:0 0 0 1px var(--m-fundo), 0 0 0 5px color-mix(in srgb,var(--m-marca) 18%, transparent)}
-html[data-m="minimal"] .selo{width:56px;height:56px;font-size:19px;
+html[data-m="minimal"] .selo{width:50px;height:50px;font-size:17px;
   background:var(--m-marca);color:var(--m-sobre-marca);border-color:transparent}
 .loja{margin:0;font:var(--m-h1-peso) var(--m-h1-tam)/var(--m-h1-altura) var(--m-display);
   letter-spacing:var(--m-h1-tracking);text-transform:var(--m-h1-caixa);text-wrap:balance}
 .sub{margin:0;color:var(--m-tinta-2);font-size:14.5px;max-width:36ch}
 
 /* ── trilho ── */
-.trilho{display:flex;gap:6px;margin:0 0 20px}
+.trilho{display:flex;gap:6px;margin:0 0 15px}
 .trilho i{flex:1;height:3px;border-radius:2px;background:var(--m-linha);transition:background .25s}
 .trilho i.on{background:var(--m-marca)}
 html[data-m="luxo"] .trilho i{height:1px;border-radius:0}
@@ -147,9 +147,9 @@ html[data-m="luxo"] .trilho i{height:1px;border-radius:0}
 .recado.aparece{display:block}
 
 /* ── passo ── */
-.passo{margin:0 0 26px}
+.passo{margin:0 0 20px}
 .passo[hidden]{display:none}
-.cab{display:flex;align-items:baseline;gap:10px;margin:0 0 13px}
+.cab{display:flex;align-items:baseline;gap:10px;margin:0 0 11px}
 .cab em{font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:var(--m-eyebrow);
   text-transform:uppercase;color:var(--m-marca);white-space:nowrap}
 .cab h2{margin:0;font:600 19px/1.2 var(--m-texto);letter-spacing:-.015em}
@@ -178,7 +178,7 @@ html[data-m="urbano"] .cab h2{font-family:var(--m-display);font-size:26px;font-w
 html[data-m="minimal"] .lista{gap:0}
 .opc{display:flex;align-items:center;gap:13px;width:100%;text-align:left;
   background:var(--m-opc-fundo);border:var(--m-borda);border-radius:var(--m-raio);
-  padding:15px 16px;transition:border-color .16s, transform .12s}
+  padding:14px 15px;transition:border-color .16s, transform .12s}
 html[data-m="minimal"] .opc{border:0;border-bottom:var(--m-borda);border-radius:0;padding:17px 2px}
 html[data-m="luxo"] .opc{border-left:0;border-right:0;border-top:0;padding:17px 2px}
 /* o ultimo da lista nao precisa de risco: o proximo elemento ja traz o seu */
@@ -298,7 +298,7 @@ html[data-m="luxo"] .barra .pr{font-family:var(--m-display);font-size:24px;font-
 .acao svg{width:18px;height:18px;flex:0 0 auto}
 
 /* ── rodape ── */
-footer{text-align:center;padding:34px 0 10px;border-top:var(--m-borda);margin-top:30px}
+footer{text-align:center;padding:26px 0 10px;border-top:var(--m-borda);margin-top:22px}
 footer img{display:block;width:48px;height:48px;border-radius:50%;margin:0 auto 9px;opacity:.9}
 footer p{margin:0;font-size:11px;color:var(--m-tinta-2);letter-spacing:.1em;text-transform:uppercase}
 </style>
@@ -410,9 +410,19 @@ var VALIDADE = 3 * 60 * 1000;   /* 3 min: depois disso, confere de novo antes de
 var PROFS = [];
 var temPasso2 = true;           /* false quando a loja tem 0 ou 1 profissional */
 
+/* Toda chamada tem prazo. Sem isto, um Apps Script frio ou uma rede
+   ruim deixam a tela em "Procurando horarios..." para sempre: o fetch
+   nao rejeita sozinho, fica pendurado. 12s e folgado para o pior caso
+   normal (o disponibilidade varre ate 60 dias) e curto o bastante para
+   a pessoa nao achar que travou. */
+var ESPERA = 12000;
 function pega(acao, extra){
+  var ctl = (typeof AbortController === 'function') ? new AbortController() : null;
+  var relogio = setTimeout(function(){ try { if (ctl) ctl.abort(); } catch(e){} }, ESPERA);
   return fetch(API + '?action=' + acao + '&b=' + encodeURIComponent(SLUG) + (extra || ''),
-               { cache:'no-store' }).then(function(r){ return r.json(); });
+               { cache:'no-store', signal: ctl ? ctl.signal : undefined })
+    .then(function(r){ clearTimeout(relogio); return r.json(); },
+          function(e){ clearTimeout(relogio); throw e; });
 }
 function falar(txt){ var e = $('#recado'); e.textContent = txt; e.classList.add('aparece');
   try { e.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(err){} }
@@ -464,6 +474,8 @@ if (!SLUG){
         $('#rot-quando').textContent = 'Passo 2';
         $('#rot-voce').textContent   = 'Passo 3';
         var t = $('#trilho'); t.removeChild(t.lastElementChild);
+        /* sem passo de profissional, a frase nao pode prometer um */
+        $('#sub-loja').textContent = 'Escolha o serviço e o horário.';
       }
 
       montarServicos(servicos);
@@ -566,9 +578,25 @@ function voltarProf(){
    A regra de disponibilidade continua inteira do servidor. Esta pagina
    so pinta o que o servidor mandou: slotsPadrao menos ocupados, e nada
    que ja passou da hora. Nenhum calculo de expediente aqui. */
+/* Cada busca leva um numero. Se a pessoa trocar de servico ou de
+   profissional antes da resposta chegar, a resposta velha chega depois
+   e pintaria a agenda errada. Fora de prazo, a gente simplesmente
+   ignora. */
+var pedido = 0;
+
+function recadoAgenda(texto){
+  $('#lista-dias').innerHTML =
+      '<p class="vazio">' + txt(texto) + '</p>'
+    + '<button class="vai" type="button" id="re-agenda" '
+    + 'style="max-width:260px;margin-top:4px">Tentar de novo</button>';
+  var b = $('#re-agenda');
+  if (b) b.addEventListener('click', function(){ buscarDias(); });
+}
+
 function buscarDias(aposRefazer){
   if (!esc.servico) return;
   mostrar('#p-quando');
+  var meu = ++pedido;
   if (!aposRefazer){
     $('#lista-dias').innerHTML = '<p class="vazio">Procurando horários…</p>';
     $('#lista-horas').innerHTML = ''; $('#sem-hora').hidden = true;
@@ -576,10 +604,12 @@ function buscarDias(aposRefazer){
   return pega('disponibilidade', '&dur=' + (Number(esc.servico.duracao) || 30)
        + (esc.prof ? '&barbeiro=' + encodeURIComponent(esc.prof.nome) : ''))
     .then(function(r){
+      if (meu !== pedido) return false;      /* chegou tarde: nao vale mais */
       disp = (r && r.dados) || null;
       dispEm = Date.now();
       if (!disp || !disp.dias || !disp.dias.length){
-        $('#lista-dias').innerHTML =
+        if (r && r.ok === false) recadoAgenda('Não consegui ver a agenda agora.');
+        else $('#lista-dias').innerHTML =
           '<p class="vazio">Esta barbearia ainda não definiu os horários dela.</p>';
         return false;
       }
@@ -609,8 +639,11 @@ function buscarDias(aposRefazer){
       montarHoras();
       return true;
     })
-    .catch(function(){
-      $('#lista-dias').innerHTML = '<p class="vazio">Não consegui ver a agenda agora.</p>';
+    .catch(function(e){
+      if (meu !== pedido) return false;
+      recadoAgenda(e && e.name === 'AbortError'
+        ? 'A agenda está demorando para responder.'
+        : 'Não consegui ver a agenda agora.');
       return false;
     });
 }
