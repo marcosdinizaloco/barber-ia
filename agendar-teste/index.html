@@ -793,6 +793,7 @@ function ics(){
 }
 
 function concluir(nome){
+  calar();          /* se o aviso de demora estava na tela, some agora */
   esconder('#f-servico','#f-prof','#f-quando','#p-servico','#p-prof','#p-quando','#p-voce');
   $('#barra').classList.remove('on');
   $('#resumo-final').innerHTML = $('#resumo').innerHTML
@@ -810,7 +811,24 @@ function concluir(nome){
   try { window.scrollTo({ top:0, behavior:'smooth' }); } catch(e){}
 }
 
+/* ══ A ESPERA DO AGENDAMENTO ══════════════════════════════════════
+   O POST NAO tem prazo de aborto, e e de proposito. Abortar no celular
+   nao desfaz nada no servidor: o agendamento pode ter entrado. Se a
+   pessoa visse "falhou" e mandasse de novo, viraria horario duplicado.
+
+   Entao, em vez de abortar: depois de 20s a gente ASSUME a palavra e
+   diz a verdade — "ainda nao foi confirmado, confira antes de tentar
+   de novo". O botao continua travado, porque enquanto a primeira
+   requisicao estiver no ar um segundo envio e exatamente o que nao
+   pode acontecer.
+
+   Se a resposta chegar depois do aviso, ela e tratada normalmente: o
+   aviso some e a confirmacao aparece uma vez so. */
+var DEMORA = 20000;
+var enviando = false;
+
 $('#confirmar').addEventListener('click', function(){
+  if (enviando) return;          /* ja tem uma a caminho */
   calar();
   var bt = this;
   var nome = $('#f-nome').value.trim();
@@ -819,8 +837,14 @@ $('#confirmar').addEventListener('click', function(){
   if (tel.length < 10)  return falar('Confira o WhatsApp — precisa ter DDD.');
   if (!esc.servico || !esc.dia || !esc.hora) return falar('Escolha o serviço, o dia e o horário.');
 
+  enviando = true;
   bt.disabled = true; bt.textContent = 'Agendando…';
-  function solta(){ bt.disabled = false; bt.textContent = 'Confirmar agendamento'; }
+  var demora = null;
+  function solta(){
+    if (demora){ clearTimeout(demora); demora = null; }
+    enviando = false;
+    bt.disabled = false; bt.textContent = 'Confirmar agendamento';
+  }
 
   /* PROBLEMA 4, primeira metade — se a lista esta velha, confere ANTES
      de gravar. Quem deixou a aba aberta meia hora nao manda um horario
@@ -837,6 +861,15 @@ $('#confirmar').addEventListener('click', function(){
       rolar('#p-quando');
       return;
     }
+    /* o relogio conta a partir do POST, nao do clique: a reconferida
+       da agenda acima nao pode disparar um aviso de "nao confirmado"
+       quando ainda nao se mandou nada. */
+    demora = setTimeout(function(){
+      bt.textContent = 'Aguardando resposta…';
+      falar('O agendamento ainda NÃO foi confirmado — a agenda está demorando para responder. '
+          + 'Não envie de novo: confira com a barbearia se o seu horário entrou antes de tentar outra vez.');
+    }, DEMORA);
+
     return enviar(bt).then(function(r){
       solta();
       if (!r || !r.ok){
