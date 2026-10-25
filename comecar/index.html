@@ -195,6 +195,23 @@ button.vai[disabled]{opacity:.55;cursor:progress;transform:none}
 footer{border-top:1px solid var(--linha);padding:20px 0 40px;color:var(--giz-2);font-size:13px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+<!-- Meta Pixel Code — Barber IA Pro -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '874839035172173');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=874839035172173&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 <div class="poste"></div>
@@ -457,6 +474,27 @@ form.addEventListener('submit', function(ev){
       return;
     }
     conta = r;
+
+    /* ── CONVERSAO ─────────────────────────────────────────────────
+       Aqui, e so aqui. Neste ponto o servidor JA criou a conta e o
+       teste de 15 dias — o r.ok acima garante isso.
+
+       Disparar no clique do botao contaria quem errou o WhatsApp,
+       quem nao passou no Turnstile e quem ja tinha conta. Isso ensina
+       o Meta a procurar o publico errado e encarece o lead.
+
+       O typeof e o try sao contra bloqueador de anuncio: se o
+       fbevents.js nao carregar, o fbq nao existe — e o cadastro NAO
+       pode quebrar por causa disso. */
+    try {
+      if (typeof fbq === 'function')
+        fbq('track', 'CompleteRegistration', {
+          content_name: 'Teste gratis 15 dias',
+          status: true,
+          value: 1.00,
+          currency: 'BRL'
+        });
+    } catch(e){}
     $('#p-titulo').textContent = cpNeg.value + ' está no ar';
     [['#lk-painel', r.painel_link], ['#lk-agenda', r.agenda_link]].forEach(function(par){
       var el = $(par[0]);
