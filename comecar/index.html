@@ -256,14 +256,13 @@ footer{border-top:1px solid var(--linha);padding:20px 0 40px;color:var(--giz-2);
       <div id="passo-form">
         <h2>Criar minha conta</h2>
         <p class="nota">Um minuto. Cinco campos. Nenhuma ligação.</p>
-        <div class="recado" id="recado" role="alert"></div>
 
         <form id="form" novalidate autocomplete="on">
           <label><u>Seu nome completo</u>
             <input id="f-nome" name="name" autocomplete="name" required maxlength="80"></label>
           <label><u>Nome da barbearia</u>
             <input id="f-negocio" name="organization" autocomplete="organization" required maxlength="60">
-            <span class="dica" id="d-negocio">O endereço do seu app nasce daqui.</span></label>
+            <span class="dica" id="d-negocio">O link que você manda para os seus clientes nasce daqui.</span></label>
           <label><u>WhatsApp</u>
             <input id="f-whats" name="tel" type="tel" inputmode="numeric" autocomplete="tel-national"
                    required placeholder="(79) 99999-9999"></label>
@@ -281,6 +280,12 @@ footer{border-top:1px solid var(--linha);padding:20px 0 40px;color:var(--giz-2);
           </div>
 
           <div id="turnstile"></div>
+
+          <!-- O aviso fica AQUI, colado no botao. Em cima da ficha ele
+               aparecia fora da tela em celular: a pessoa apertava,
+               nada parecia acontecer, e o motivo estava tres rolagens
+               acima. -->
+          <div class="recado" id="recado" role="alert"></div>
 
           <button class="vai" type="submit" id="botao">COMEÇAR MEU TESTE GRÁTIS</button>
           <p class="rodape-ficha">15 dias grátis. Sem cartão. O teste simplesmente acaba.</p>
@@ -390,9 +395,13 @@ cpNeg.addEventListener('input', function(){
     .replace(/[\u00e0-\u00e5]/g,'a').replace(/[\u00e8-\u00eb]/g,'e').replace(/[\u00ec-\u00ef]/g,'i')
     .replace(/[\u00f2-\u00f6]/g,'o').replace(/[\u00f9-\u00fc]/g,'u').replace(/\u00e7/g,'c')
     .replace(/[^a-z0-9]/g,'').slice(0,40);
+  /* O endereco do METODO B. O /ag/ nao e enfeite: barber-ia.pro/<slug>
+     sem o /ag/ e o endereco dos aplicativos do Metodo A, que sao outra
+     coisa. Mostrar o errado aqui ensinaria a pessoa um link que nao
+     funciona para ela. */
   dNeg.innerHTML = s.length >= 3
-    ? 'Seu endereço: <b>barber-ia.pro/' + s + '</b>'
-    : 'O endereço do seu app nasce daqui.';
+    ? 'Link dos seus clientes: <b>barber-ia.pro/ag/' + s + '</b>'
+    : 'O link que você manda para os seus clientes nasce daqui.';
 });
 
 var TEXTO = {
@@ -403,7 +412,7 @@ var TEXTO = {
   senha_curta:'A senha precisa de pelo menos 6 caracteres.',
   senha_invalida:'Escolha outra senha.',
   sem_aceite:'Marque o aceite dos termos para continuar.',
-  ja_cadastrado:'Esse WhatsApp já tem uma barbearia aqui.',
+  ja_cadastrado:'Esse WhatsApp já está cadastrado. Se a conta é sua, o link do painel está no e-mail e no WhatsApp que a gente te mandou.',
   nome_curto:'O nome da barbearia é curto demais.',
   sem_slug_livre:'Já existem muitas barbearias com esse nome. Tente um nome um pouco diferente.',
   nao_consegui_conferir:'Não consegui conferir o endereço agora. Tente de novo em um minuto.',
@@ -417,6 +426,7 @@ function falar(c, erro){
   var el = $(c);
   el.textContent = TEXTO[erro] || 'Não consegui concluir agora. Tente de novo.';
   el.classList.add('aparece');
+  try { el.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(e){}
 }
 function calar(c){ $(c).classList.remove('aparece'); }
 
@@ -440,9 +450,10 @@ form.addEventListener('submit', function(ev){
   .then(function(r){
     botao.disabled = false; botao.textContent = 'COMEÇAR MEU TESTE GRÁTIS';
     if (!r || !r.ok){
+      /* Sem atalho para o painel. Oferecer "entrar nela" aqui
+         entregava o endereco da conta de outra pessoa a quem so
+         soubesse o telefone dela. */
       falar('#recado', r && r.erro);
-      if (r && r.erro === 'ja_cadastrado' && r.painel)
-        $('#recado').innerHTML += ' <a href="' + r.painel + '" style="color:var(--giz)">Entrar nela</a>.';
       return;
     }
     conta = r;
