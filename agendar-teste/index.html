@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="pt-BR" data-m="urbano">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Agendar</title>
+<meta name="description" content="Agende seu horário em poucos toques.">
+<meta name="theme-color" content="#0B0D10">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://script.google.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Cormorant+Garamond:wght@500;600;700&family=Figtree:wght@400;500;600;700;800&display=swap">
+<style>
+/* ══════════════════════════════════════════════════════════════════════
+   ALOCO / BARBER IA PRO — pagina publica de agendamento (Metodo B)
+   Servida em barber-ia.pro/ag/<slug>  (o 404.html manda para ca).
+
+   ETAPA 1: so a pagina. Nao fala com nada novo no servidor.
+   As cinco chamadas sao EXATAMENTE as mesmas de antes:
+     GET  action=nome | servicos | barbeiros | disponibilidade
+     POST action=agendar
+   Nenhuma action nova, nenhum parametro novo, nenhuma biblioteca nova.
+
+   UM SO SISTEMA DE TOKENS, TRES MODELOS.
+   Toda a aparencia sai das variaveis --m-*. O modelo em
+   <html data-m="luxo|urbano|minimal"> define o conjunto inteiro.
+   Na Etapa 2 a barbearia vai sobrescrever TRES delas — --m-marca,
+   --m-marca-2 e --m-fundo — e mais nada. E por isso que trocar de
+   modelo nao perde a cor da loja, e trocar a cor nao quebra o modelo.
+
+   Enquanto a Etapa 2 nao existe, o modelo pode ser trocado por
+   ?m=luxo na URL. Serve para testar e para voce decidir. Valor
+   desconhecido cai no padrao, nunca quebra.
+   ══════════════════════════════════════════════════════════════════════ */
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--m-fundo);color:var(--m-tinta);
+  font:400 16px/1.55 var(--m-texto);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--m-marca);outline-offset:3px;border-radius:4px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;
+  scroll-behavior:auto!important}}
+
+/* ── MODELO B — URBANO MODERNO (padrao: e a identidade do Barber IA Pro) ── */
+html[data-m="urbano"]{
+  --m-fundo:#0B0D10; --m-superficie:#141821; --m-superficie-2:#1B2029;
+  --m-linha:#262D39; --m-tinta:#EDEAE4; --m-tinta-2:#99A1AE;
+  --m-marca:#0097FD; --m-marca-2:#5CBBFF; --m-sobre-marca:#04121F;
+  --m-ok:#3CCB7F; --m-erro:#FF7A6B;
+  --m-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --m-texto:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --m-h1-tam:clamp(30px,9vw,42px); --m-h1-peso:800; --m-h1-tracking:-.01em;
+  --m-h1-caixa:uppercase; --m-h1-altura:.95;
+  --m-eyebrow:.18em;
+  --m-raio:16px; --m-raio-btn:12px; --m-raio-chip:10px;
+  --m-borda:1px solid var(--m-linha); --m-sombra:0 12px 30px -22px #000;
+  --m-capa:168px; --m-logo-raio:14px; --m-opc-fundo:var(--m-superficie);
+  --m-cta-caixa:uppercase; --m-cta-tracking:.06em; --m-cta-peso:800;
+}
+/* ── MODELO A — LUXO CLASSICO ── */
+html[data-m="luxo"]{
+  --m-fundo:#0E0C0A; --m-superficie:#17130F; --m-superficie-2:#1E1813;
+  --m-linha:#2E251C; --m-tinta:#F2EBDF; --m-tinta-2:#A2957F;
+  --m-marca:#C9A227; --m-marca-2:#E8CE72; --m-sobre-marca:#19130A;
+  --m-ok:#8FB573; --m-erro:#D08A6A;
+  --m-display:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --m-texto:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --m-h1-tam:clamp(34px,10vw,50px); --m-h1-peso:600; --m-h1-tracking:.005em;
+  --m-h1-caixa:none; --m-h1-altura:1.05;
+  --m-eyebrow:.3em;
+  --m-raio:3px; --m-raio-btn:2px; --m-raio-chip:2px;
+  --m-borda:1px solid var(--m-linha); --m-sombra:none;
+  --m-capa:196px; --m-logo-raio:50%; --m-opc-fundo:transparent;
+  --m-cta-caixa:uppercase; --m-cta-tracking:.22em; --m-cta-peso:600;
+}
+/* ── MODELO C — MINIMALISTA PREMIUM ── */
+html[data-m="minimal"]{
+  --m-fundo:#FAFAF8; --m-superficie:#FFFFFF; --m-superficie-2:#F3F3F0;
+  --m-linha:#E4E4DF; --m-tinta:#15161A; --m-tinta-2:#71737A;
+  --m-marca:#0A6FC2; --m-marca-2:#0097FD; --m-sobre-marca:#FFFFFF;
+  --m-ok:#1F7A4C; --m-erro:#B4402E;
+  --m-display:"Figtree",system-ui,sans-serif;
+  --m-texto:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --m-h1-tam:clamp(26px,7.4vw,34px); --m-h1-peso:700; --m-h1-tracking:-.025em;
+  --m-h1-caixa:none; --m-h1-altura:1.12;
+  --m-eyebrow:.14em;
+  --m-raio:14px; --m-raio-btn:999px; --m-raio-chip:999px;
+  --m-borda:1px solid var(--m-linha); --m-sombra:none;
+  --m-capa:0px; --m-logo-raio:50%; --m-opc-fundo:transparent;
+  --m-cta-caixa:none; --m-cta-tracking:0; --m-cta-peso:700;
+}
+html[data-m="minimal"]{color-scheme:light}
+html[data-m="urbano"],html[data-m="luxo"]{color-scheme:dark}
+
+/* ── poste de barbeiro: igual ao da pagina de hoje, byte por byte.
+      E a unica decoracao e ela tem funcao: diz "barbearia" antes de
+      qualquer texto carregar. Nao mexi. ── */
+.poste{height:10px;background:repeating-linear-gradient(-45deg,#D62828 0 18px,#F4F1EA 18px 36px,#1E5BD8 36px 54px,#F4F1EA 54px 72px);background-size:101.8px 101.8px;animation:gira 1.6s linear infinite}
+@keyframes gira{to{background-position:101.8px 0}}
+
+.env{max-width:560px;margin:0 auto;padding:0 16px 120px}
+
+/* ── carregando / erro ── */
+.carregando{padding:84px 4px;text-align:center;color:var(--m-tinta-2);font-size:15px}
+.carregando .loja{color:var(--m-tinta)}
+
+/* ── capa + cabecalho ── */
+.capa{position:relative;height:var(--m-capa);margin:0 -16px;overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 70% 0%, color-mix(in srgb,var(--m-marca) 30%, transparent), transparent 62%),
+    linear-gradient(180deg, var(--m-superficie-2), var(--m-fundo));
+  border-bottom:var(--m-borda)}
+.capa:after{content:"";position:absolute;inset:auto 0 0 0;height:60%;
+  background:linear-gradient(180deg,transparent,var(--m-fundo))}
+html[data-m="minimal"] .capa{display:none}
+
+.topo{position:relative;display:flex;flex-direction:column;align-items:center;
+  text-align:center;gap:12px;padding:0 0 22px;margin-top:calc(var(--m-capa) * -0.34)}
+html[data-m="minimal"] .topo{margin-top:0;padding-top:26px;align-items:flex-start;text-align:left}
+.selo{width:84px;height:84px;border-radius:var(--m-logo-raio);flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--m-superficie);border:1px solid var(--m-linha);
+  font:700 27px/1 var(--m-display);letter-spacing:.02em;color:var(--m-marca);
+  box-shadow:var(--m-sombra);overflow:hidden}
+html[data-m="luxo"] .selo{border-color:var(--m-marca);
+  box-shadow:0 0 0 1px var(--m-fundo), 0 0 0 5px color-mix(in srgb,var(--m-marca) 18%, transparent)}
+html[data-m="minimal"] .selo{width:56px;height:56px;font-size:19px;
+  background:var(--m-marca);color:var(--m-sobre-marca);border-color:transparent}
+.loja{margin:0;font:var(--m-h1-peso) var(--m-h1-tam)/var(--m-h1-altura) var(--m-display);
+  letter-spacing:var(--m-h1-tracking);text-transform:var(--m-h1-caixa);text-wrap:balance}
+.sub{margin:0;color:var(--m-tinta-2);font-size:14.5px;max-width:36ch}
+
+/* ── trilho ── */
+.trilho{display:flex;gap:6px;margin:0 0 20px}
+.trilho i{flex:1;height:3px;border-radius:2px;background:var(--m-linha);transition:background .25s}
+.trilho i.on{background:var(--m-marca)}
+html[data-m="luxo"] .trilho i{height:1px;border-radius:0}
+
+/* ── recado ── */
+.recado{display:none;margin:0 0 16px;padding:13px 15px;border-radius:var(--m-raio);
+  background:color-mix(in srgb,var(--m-erro) 13%, transparent);
+  border:1px solid color-mix(in srgb,var(--m-erro) 42%, transparent);
+  color:var(--m-erro);font-size:14px;font-weight:600;line-height:1.45}
+.recado.aparece{display:block}
+
+/* ── passo ── */
+.passo{margin:0 0 26px}
+.passo[hidden]{display:none}
+.cab{display:flex;align-items:baseline;gap:10px;margin:0 0 13px}
+.cab em{font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:var(--m-eyebrow);
+  text-transform:uppercase;color:var(--m-marca);white-space:nowrap}
+.cab h2{margin:0;font:600 19px/1.2 var(--m-texto);letter-spacing:-.015em}
+html[data-m="luxo"] .cab h2{font-family:var(--m-display);font-size:25px;letter-spacing:.01em}
+html[data-m="urbano"] .cab h2{font-family:var(--m-display);font-size:26px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.005em}
+
+/* ── passo ja resolvido: vira uma linha tocavel ── */
+.feita{display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+  background:transparent;border:0;border-bottom:var(--m-borda);padding:13px 2px;margin:0 0 2px}
+/* o [hidden] do navegador perde para o display:flex acima. Sem esta
+   linha, o passo escondido deixa um risco vazio na tela. */
+.feita[hidden]{display:none}
+.feita .ic{width:19px;height:19px;border-radius:50%;flex:0 0 auto;display:flex;
+  align-items:center;justify-content:center;background:var(--m-marca);
+  color:var(--m-sobre-marca);font-size:11px;font-weight:800}
+.feita .tx{flex:1;min-width:0}
+.feita .tx u{display:block;text-decoration:none;font-size:10.5px;font-weight:700;
+  letter-spacing:var(--m-eyebrow);text-transform:uppercase;color:var(--m-tinta-2)}
+.feita .tx b{display:block;font-size:15px;font-weight:600;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.feita .ed{font-size:12.5px;font-weight:700;color:var(--m-marca);flex:0 0 auto}
+
+/* ── opcao ── */
+.lista{display:flex;flex-direction:column;gap:9px}
+html[data-m="minimal"] .lista{gap:0}
+.opc{display:flex;align-items:center;gap:13px;width:100%;text-align:left;
+  background:var(--m-opc-fundo);border:var(--m-borda);border-radius:var(--m-raio);
+  padding:15px 16px;transition:border-color .16s, transform .12s}
+html[data-m="minimal"] .opc{border:0;border-bottom:var(--m-borda);border-radius:0;padding:17px 2px}
+html[data-m="luxo"] .opc{border-left:0;border-right:0;border-top:0;padding:17px 2px}
+/* o ultimo da lista nao precisa de risco: o proximo elemento ja traz o seu */
+.lista .opc:last-child{border-bottom:0}
+.opc:active{transform:scale(.99)}
+.opc:hover{border-color:color-mix(in srgb,var(--m-marca) 55%, var(--m-linha))}
+.opc .av{width:40px;height:40px;border-radius:50%;flex:0 0 auto;display:flex;
+  align-items:center;justify-content:center;font:700 14px/1 var(--m-texto);overflow:hidden;
+  background:color-mix(in srgb,var(--m-marca) 15%, var(--m-superficie));color:var(--m-marca)}
+.opc .av img{width:100%;height:100%;object-fit:cover}
+.opc .n{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.opc .n b{font-size:15.5px;font-weight:600;letter-spacing:-.01em}
+.opc .n span{font-size:12.5px;color:var(--m-tinta-2)}
+.opc .v{font-size:15.5px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+html[data-m="luxo"] .opc .v{font-family:var(--m-display);font-size:21px;font-weight:600;color:var(--m-marca)}
+html[data-m="urbano"] .opc .v{color:var(--m-marca)}
+.opc .seta{color:var(--m-tinta-2);font-size:17px;flex:0 0 auto}
+html[data-m="minimal"] .opc .seta{display:none}
+
+/* ── dias ── */
+.dias{display:flex;gap:8px;overflow-x:auto;padding:2px 16px 10px;margin:0 -16px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.dias::-webkit-scrollbar{display:none}
+.dia{flex:0 0 auto;width:60px;padding:10px 0 11px;text-align:center;
+  background:var(--m-opc-fundo);border:var(--m-borda);border-radius:var(--m-raio);transition:all .16s}
+html[data-m="minimal"] .dia{background:var(--m-superficie)}
+.dia s{display:block;text-decoration:none;font-size:10.5px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--m-tinta-2)}
+.dia b{display:block;font-size:21px;font-weight:700;line-height:1.25;font-variant-numeric:tabular-nums}
+html[data-m="luxo"] .dia b{font-family:var(--m-display);font-size:26px;font-weight:600}
+.dia i{display:block;font-style:normal;font-size:10.5px;color:var(--m-tinta-2)}
+.dia[aria-pressed="true"]{background:var(--m-marca);border-color:var(--m-marca);color:var(--m-sobre-marca)}
+.dia[aria-pressed="true"] s,.dia[aria-pressed="true"] i{color:var(--m-sobre-marca);opacity:.72}
+
+/* ── horas, por turno ── */
+.turno{margin-top:17px}
+.turno:first-child{margin-top:4px}
+.turno>u{display:block;text-decoration:none;font-size:10.5px;font-weight:700;
+  letter-spacing:var(--m-eyebrow);text-transform:uppercase;color:var(--m-tinta-2);margin:0 0 9px}
+.horas{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px}
+.hora{padding:13px 4px;text-align:center;font-size:15px;font-weight:600;
+  font-variant-numeric:tabular-nums;background:var(--m-opc-fundo);
+  border:var(--m-borda);border-radius:var(--m-raio-chip);transition:all .16s}
+html[data-m="minimal"] .hora{background:var(--m-superficie)}
+.hora:hover{border-color:var(--m-marca)}
+.hora[aria-pressed="true"]{background:var(--m-marca);border-color:var(--m-marca);color:var(--m-sobre-marca)}
+.vazio{margin:14px 2px;color:var(--m-tinta-2);font-size:14px}
+
+/* ── resumo ── */
+.resumo{border:var(--m-borda);border-radius:var(--m-raio);overflow:hidden;margin:0 0 18px}
+html[data-m="luxo"] .resumo{border-left:0;border-right:0;border-radius:0}
+.resumo div{display:flex;align-items:baseline;justify-content:space-between;gap:14px;
+  padding:13px 15px;border-bottom:var(--m-borda)}
+html[data-m="luxo"] .resumo div{padding:13px 2px}
+.resumo div:last-child{border-bottom:0}
+.resumo span{font-size:12.5px;color:var(--m-tinta-2);flex:0 0 auto}
+.resumo b{font-size:15px;font-weight:600;text-align:right}
+.resumo .total b{font-size:20px;color:var(--m-marca)}
+html[data-m="luxo"] .resumo .total b{font-family:var(--m-display);font-size:26px;font-weight:600}
+html[data-m="minimal"] .resumo .total b{color:var(--m-tinta)}
+
+/* ── campos ── */
+label{display:block;margin:0 0 13px}
+label u{display:block;text-decoration:none;font-size:11px;font-weight:700;
+  letter-spacing:var(--m-eyebrow);text-transform:uppercase;color:var(--m-tinta-2);margin:0 0 7px}
+input{width:100%;background:var(--m-superficie);color:var(--m-tinta);
+  border:var(--m-borda);border-radius:var(--m-raio-btn);padding:15px;
+  font:500 16px/1.2 var(--m-texto)}
+html[data-m="luxo"] input{border-radius:2px}
+input:focus{outline:0;border-color:var(--m-marca)}
+input::placeholder{color:color-mix(in srgb,var(--m-tinta-2) 70%, transparent)}
+
+/* ── CTA ── */
+.vai{display:block;width:100%;border:0;border-radius:var(--m-raio-btn);
+  background:var(--m-marca);color:var(--m-sobre-marca);padding:18px 16px;margin-top:4px;
+  font:var(--m-cta-peso) 15.5px/1 var(--m-texto);
+  letter-spacing:var(--m-cta-tracking);text-transform:var(--m-cta-caixa);
+  transition:transform .12s, filter .16s}
+html[data-m="luxo"] .vai{background:transparent;color:var(--m-marca);
+  border:1px solid var(--m-marca);font-family:var(--m-display);font-size:17px}
+.vai:active{transform:scale(.985)}
+.vai[disabled]{opacity:.55;cursor:default}
+
+/* ── barra fixa ── */
+.barra{position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:color-mix(in srgb,var(--m-fundo) 92%, transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:var(--m-borda);
+  padding:11px 16px calc(11px + env(safe-area-inset-bottom,0px));
+  transform:translateY(110%);visibility:hidden;
+  transition:transform .26s cubic-bezier(.3,.9,.4,1), visibility .26s}
+.barra.on{transform:none;visibility:visible}
+.barra .in{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.barra .tx{flex:1;min-width:0}
+.barra .tx u{display:block;text-decoration:none;font-size:10.5px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--m-tinta-2)}
+.barra .tx b{display:block;font-size:14.5px;font-weight:600;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.barra .pr{font-size:19px;font-weight:700;color:var(--m-marca);font-variant-numeric:tabular-nums}
+html[data-m="minimal"] .barra .pr{color:var(--m-tinta)}
+html[data-m="luxo"] .barra .pr{font-family:var(--m-display);font-size:24px;font-weight:600}
+
+/* ── confirmado ── */
+.feito{text-align:center;padding:16px 0 0}
+.tique{width:70px;height:70px;border-radius:50%;margin:0 auto 18px;
+  display:flex;align-items:center;justify-content:center;font-size:33px;
+  background:color-mix(in srgb,var(--m-ok) 16%, transparent);color:var(--m-ok);
+  border:1px solid color-mix(in srgb,var(--m-ok) 42%, transparent)}
+.feito h2{margin:0 0 6px;font:var(--m-h1-peso) clamp(26px,7.5vw,34px)/1.1 var(--m-display);
+  letter-spacing:var(--m-h1-tracking);text-transform:var(--m-h1-caixa)}
+.feito .sub{margin:0 auto 20px}
+.acoes{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.acao{display:flex;align-items:center;justify-content:center;gap:9px;padding:15px;
+  border:var(--m-borda);border-radius:var(--m-raio-btn);background:var(--m-superficie);
+  font-size:14.5px;font-weight:600;text-decoration:none}
+.acao[hidden]{display:none}
+.acao.zap{background:#25D366;border-color:#25D366;color:#06270F}
+.acao svg{width:18px;height:18px;flex:0 0 auto}
+
+/* ── rodape ── */
+footer{text-align:center;padding:34px 0 10px;border-top:var(--m-borda);margin-top:30px}
+footer img{display:block;width:48px;height:48px;border-radius:50%;margin:0 auto 9px;opacity:.9}
+footer p{margin:0;font-size:11px;color:var(--m-tinta-2);letter-spacing:.1em;text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<div class="poste"></div>
+
+<div class="env">
+  <div id="carregando" class="carregando">Carregando…</div>
+
+  <div id="tudo" hidden>
+    <div class="capa" id="capa"></div>
+
+    <div class="topo">
+      <div class="selo" id="selo"></div>
+      <h1 class="loja" id="nome-loja">Barbearia</h1>
+      <p class="sub" id="sub-loja">Escolha o serviço, o profissional e o horário.</p>
+    </div>
+
+    <div class="trilho" id="trilho"><i class="on"></i><i></i><i></i><i></i></div>
+
+    <div class="recado" id="recado" role="alert" aria-live="polite"></div>
+
+    <button class="feita" type="button" id="f-servico" hidden></button>
+    <section class="passo" id="p-servico">
+      <div class="cab"><em>Passo 1</em><h2>Qual serviço?</h2></div>
+      <div class="lista" id="lista-servicos"></div>
+    </section>
+
+    <button class="feita" type="button" id="f-prof" hidden></button>
+    <section class="passo" id="p-prof" hidden>
+      <div class="cab"><em>Passo 2</em><h2>Com quem?</h2></div>
+      <div class="lista" id="lista-prof"></div>
+    </section>
+
+    <button class="feita" type="button" id="f-quando" hidden></button>
+    <section class="passo" id="p-quando" hidden>
+      <div class="cab"><em id="rot-quando">Passo 3</em><h2>Quando?</h2></div>
+      <div class="dias" id="lista-dias"></div>
+      <div id="lista-horas"></div>
+      <p class="vazio" id="sem-hora" hidden>Nenhum horário livre neste dia.</p>
+    </section>
+
+    <section class="passo" id="p-voce" hidden>
+      <div class="cab"><em id="rot-voce">Passo 4</em><h2>Quase lá</h2></div>
+      <div class="resumo" id="resumo"></div>
+      <label><u>Seu nome</u>
+        <input id="f-nome" autocomplete="name" maxlength="60" placeholder="Como te chamam"></label>
+      <label><u>Seu WhatsApp</u>
+        <input id="f-tel" type="tel" inputmode="numeric" autocomplete="tel-national"
+               maxlength="16" placeholder="(79) 99999-9999"></label>
+      <button class="vai" id="confirmar" type="button">Confirmar agendamento</button>
+    </section>
+
+    <section class="passo feito" id="p-feito" hidden>
+      <div class="tique">&#10003;</div>
+      <h2>Agendado</h2>
+      <p class="sub" id="feito-sub">Te esperamos. Chegue uns 5 minutos antes.</p>
+      <div class="resumo" id="resumo-final"></div>
+      <div class="acoes">
+        <a class="acao zap" id="link-zap" href="#" target="_blank" rel="noopener" hidden>
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.4 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 1-2.3.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.1.1.3 0 .5l-.3.5-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.8.9c.3.1.5.2.5.3.1.1.1.7-.1 1.3Z"/></svg>
+          Avisar no WhatsApp</a>
+        <a class="acao" id="link-ics" href="#" download="agendamento.ics">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
+          Salvar na agenda do celular</a>
+      </div>
+    </section>
+
+    <footer>
+      <!-- a logo e o arquivo que ja existe no repositorio. Se um dia ela sair
+     de la, o onerror tira a imagem e sobra o nome escrito — a pagina
+     nunca mostra icone quebrado. -->
+      <img src="/assets/logo-pro.webp" width="48" height="48" alt=""
+           loading="lazy" decoding="async" onerror="this.remove()">
+      <p>agendamento por Barber IA Pro</p>
+    </footer>
+  </div>
+</div>
+
+<div class="barra" id="barra">
+  <div class="in">
+    <div class="tx"><u id="barra-rot">Escolhido</u><b id="barra-tx">—</b></div>
+    <div class="pr" id="barra-pr"></div>
+  </div>
+</div>
+
+<script>
+/* ══ 0. BASE — identica a de antes ══════════════════════════════════ */
+var API = 'https://script.google.com/macros/s/AKfycbwjH7c69qlBz58Cuy0c23Yq7kSC-4PpohEqQCpKUy4gAb6Q1Syzqp-hxVra00wRr7RhiQ/exec';
+var $ = function(s){ return document.querySelector(s); };
+var SLUG = (new URLSearchParams(location.search)).get('b') || '';
+SLUG = SLUG.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 60);
+
+/* modelo visual. Etapa 1: so pela URL, para testar.
+   Etapa 2: vira o campo "modelo" da aba Marca. */
+(function(){
+  var MODELOS = { luxo:1, urbano:1, minimal:1 };
+  var m = (new URLSearchParams(location.search)).get('m') || '';
+  if (MODELOS[m]) document.documentElement.setAttribute('data-m', m);
+})();
+
+var loja = { nome:'', whatsapp:'' };
+var esc  = { servico:null, prof:null, dia:null, hora:null };
+var disp = null;
+var dispEm = 0;                 /* quando a disponibilidade foi buscada */
+var VALIDADE = 3 * 60 * 1000;   /* 3 min: depois disso, confere de novo antes de gravar */
+var PROFS = [];
+var temPasso2 = true;           /* false quando a loja tem 0 ou 1 profissional */
+
+function pega(acao, extra){
+  return fetch(API + '?action=' + acao + '&b=' + encodeURIComponent(SLUG) + (extra || ''),
+               { cache:'no-store' }).then(function(r){ return r.json(); });
+}
+function falar(txt){ var e = $('#recado'); e.textContent = txt; e.classList.add('aparece');
+  try { e.scrollIntoView({ behavior:'smooth', block:'center' }); } catch(err){} }
+function calar(){ $('#recado').classList.remove('aparece'); }
+function moeda(v){ return 'R$ ' + (Number(v)||0).toFixed(2).replace('.', ','); }
+function txt(s){ return String(s == null ? '' : s)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function iniciais(s){
+  var p = String(s||'').trim().split(/\s+/);
+  return ((p[0]||'')[0] || '?').toUpperCase() + ((p[1]||'')[0] || '').toUpperCase();
+}
+function morrer(titulo, texto){
+  $('#carregando').innerHTML =
+      '<h1 class="loja" style="margin-bottom:10px">' + txt(titulo) + '</h1>'
+    + '<p class="sub" style="margin:0 auto">' + txt(texto) + '</p>';
+}
+function esconder(){ for (var i=0;i<arguments.length;i++){ var e=$(arguments[i]); if(e) e.hidden=true; } }
+function mostrar(id){ var e=$(id); if(e) e.hidden=false; }
+function rolar(id){ try { $(id).scrollIntoView({ behavior:'smooth', block:'start' }); } catch(e){} }
+
+/* ══ 1. CARREGAR — as mesmas tres chamadas de antes ══════════════════ */
+if (!SLUG){
+  morrer('Endereço incompleto', 'Peça o link de agendamento para a barbearia.');
+} else {
+  Promise.all([ pega('nome'), pega('servicos'), pega('barbeiros') ])
+    .then(function(r){
+      var n = r[0], sv = r[1], bb = r[2];
+      if (!n || !n.ok){
+        morrer('Barbearia não encontrada', 'Confira o link com quem te mandou.');
+        return;
+      }
+      loja.nome = n.nome; loja.whatsapp = String(n.whatsapp || '');
+      document.title = 'Agendar — ' + loja.nome;
+      $('#nome-loja').textContent = loja.nome;
+      $('#selo').textContent = iniciais(loja.nome);
+
+      var servicos = (sv && sv.dados) || [];
+      PROFS = (bb && bb.dados) || [];
+      if (!servicos.length){
+        morrer(loja.nome, 'Esta barbearia ainda não cadastrou os serviços dela.');
+        return;
+      }
+
+      /* PROBLEMA 5 — com 0 ou 1 profissional, o passo 2 nao existe.
+         Um passo inteiro para uma escolha que nao existe so cansa. */
+      temPasso2 = PROFS.length > 1;
+      if (!temPasso2){
+        esc.prof = PROFS.length === 1 ? PROFS[0] : null;
+        $('#rot-quando').textContent = 'Passo 2';
+        $('#rot-voce').textContent   = 'Passo 3';
+        var t = $('#trilho'); t.removeChild(t.lastElementChild);
+      }
+
+      montarServicos(servicos);
+      montarProf(PROFS);
+      lembrar();
+      $('#carregando').hidden = true;
+      $('#tudo').hidden = false;
+    })
+    .catch(function(){ morrer('Não consegui carregar', 'Tente de novo daqui a pouco.'); });
+}
+
+/* ══ 2. PECAS ═══════════════════════════════════════════════════════ */
+function botao(classe, dentro, aoClicar){
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = classe; b.innerHTML = dentro;
+  b.addEventListener('click', function(){ aoClicar(b); });
+  return b;
+}
+function passoAtual(n){
+  var t = $('#trilho').children;
+  for (var i=0;i<t.length;i++) t[i].className = i < n ? 'on' : '';
+}
+function linhaFeita(id, rotulo, valor, voltar){
+  var b = $(id);
+  b.innerHTML = '<span class="ic">&#10003;</span>'
+    + '<span class="tx"><u>' + txt(rotulo) + '</u><b>' + txt(valor) + '</b></span>'
+    + '<span class="ed">trocar</span>';
+  b.hidden = false;
+  b.onclick = voltar;
+}
+function barra(){
+  var b = $('#barra');
+  if (!esc.servico){ b.classList.remove('on'); return; }
+  var t = esc.servico.nome;
+  if (esc.dia && esc.hora) t += ' · ' + esc.dia.label + ' às ' + esc.hora;
+  else if (esc.prof) t += ' · ' + esc.prof.nome;
+  $('#barra-rot').textContent = esc.hora ? 'Seu agendamento' : 'Escolhido';
+  $('#barra-tx').textContent = t;
+  $('#barra-pr').textContent = moeda(esc.servico.preco);
+  b.classList.add('on');
+}
+
+/* ══ 3. SERVICO ═════════════════════════════════════════════════════ */
+function montarServicos(lista){
+  var alvo = $('#lista-servicos'); alvo.innerHTML = '';
+  lista.forEach(function(s){
+    alvo.appendChild(botao('opc',
+      '<span class="n"><b>' + txt(s.nome) + '</b><span>' + (Number(s.duracao)||30) + ' min</span></span>'
+      + '<span class="v">' + moeda(s.preco) + '</span><span class="seta">&#8250;</span>',
+      function(){
+        calar();
+        esc.servico = s; esc.dia = null; esc.hora = null;
+        if (temPasso2) esc.prof = null;
+        esconder('#p-servico','#f-prof','#p-quando','#f-quando','#p-voce');
+        linhaFeita('#f-servico', 'Serviço', s.nome + ' · ' + moeda(s.preco), voltarServico);
+        if (temPasso2){ mostrar('#p-prof'); passoAtual(2); barra(); rolar('#p-prof'); }
+        else { mostrar('#p-quando'); passoAtual(2); barra(); buscarDias(); rolar('#p-quando'); }
+      }));
+  });
+}
+function voltarServico(){
+  calar();
+  esconder('#f-servico','#p-prof','#f-prof','#p-quando','#f-quando','#p-voce');
+  mostrar('#p-servico'); passoAtual(1);
+  esc.servico = null; esc.dia = null; esc.hora = null; barra();
+}
+
+/* ══ 4. PROFISSIONAL ════════════════════════════════════════════════ */
+function montarProf(lista){
+  var alvo = $('#lista-prof'); alvo.innerHTML = '';
+  var opcoes = lista.slice();
+  opcoes.unshift({ id:'', nome:'Tanto faz', _qualquer:true });
+  opcoes.forEach(function(p){
+    var av = p._qualquer
+      ? '<span class="av">&#8226;&#8226;</span>'
+      : '<span class="av">' + (p.foto
+          ? '<img src="' + txt(p.foto) + '" alt="" loading="lazy" decoding="async">'
+          : txt(iniciais(p.nome))) + '</span>';
+    alvo.appendChild(botao('opc',
+      av + '<span class="n"><b>' + txt(p.nome) + '</b>'
+      + (p._qualquer ? '<span>quem estiver livre</span>' : '') + '</span>'
+      + '<span class="seta">&#8250;</span>',
+      function(){
+        calar();
+        esc.prof = p._qualquer ? null : p; esc.dia = null; esc.hora = null;
+        esconder('#p-prof','#f-quando','#p-voce');
+        linhaFeita('#f-prof', 'Profissional', p._qualquer ? 'Tanto faz' : p.nome, voltarProf);
+        mostrar('#p-quando'); passoAtual(3); barra(); buscarDias(); rolar('#p-quando');
+      }));
+  });
+}
+function voltarProf(){
+  calar();
+  esconder('#f-prof','#p-quando','#f-quando','#p-voce');
+  mostrar('#p-prof'); passoAtual(2);
+  esc.prof = null; esc.dia = null; esc.hora = null; barra();
+}
+
+/* ══ 5. DIA E HORA ══════════════════════════════════════════════════
+   A regra de disponibilidade continua inteira do servidor. Esta pagina
+   so pinta o que o servidor mandou: slotsPadrao menos ocupados, e nada
+   que ja passou da hora. Nenhum calculo de expediente aqui. */
+function buscarDias(aposRefazer){
+  if (!esc.servico) return;
+  mostrar('#p-quando');
+  if (!aposRefazer){
+    $('#lista-dias').innerHTML = '<p class="vazio">Procurando horários…</p>';
+    $('#lista-horas').innerHTML = ''; $('#sem-hora').hidden = true;
+  }
+  return pega('disponibilidade', '&dur=' + (Number(esc.servico.duracao) || 30)
+       + (esc.prof ? '&barbeiro=' + encodeURIComponent(esc.prof.nome) : ''))
+    .then(function(r){
+      disp = (r && r.dados) || null;
+      dispEm = Date.now();
+      if (!disp || !disp.dias || !disp.dias.length){
+        $('#lista-dias').innerHTML =
+          '<p class="vazio">Esta barbearia ainda não definiu os horários dela.</p>';
+        return false;
+      }
+      var guardaDia = esc.dia && esc.dia.data;
+      var alvo = $('#lista-dias'); alvo.innerHTML = '';
+      var achou = null;
+      disp.dias.forEach(function(d){
+        var b = botao('dia',
+          '<s>' + txt(d.semana) + '</s><b>' + txt(d.dia) + '</b><i>' + txt(d.mes) + '</i>',
+          function(el){
+            calar();
+            alvo.querySelectorAll('.dia').forEach(function(o){ o.setAttribute('aria-pressed','false'); });
+            el.setAttribute('aria-pressed','true');
+            esc.dia = d; esc.hora = null;
+            esconder('#f-quando','#p-voce'); mostrar('#p-quando');
+            passoAtual(temPasso2 ? 3 : 2);
+            montarHoras(); barra();
+          });
+        b.setAttribute('aria-pressed','false');
+        alvo.appendChild(b);
+        if (d.data === guardaDia) achou = { d:d, b:b };
+      });
+      /* mantem o dia que a pessoa ja tinha escolhido; senao, o primeiro */
+      var alvoDia = achou || { d: disp.dias[0], b: alvo.firstChild };
+      esc.dia = alvoDia.d;
+      if (alvoDia.b) alvoDia.b.setAttribute('aria-pressed','true');
+      montarHoras();
+      return true;
+    })
+    .catch(function(){
+      $('#lista-dias').innerHTML = '<p class="vazio">Não consegui ver a agenda agora.</p>';
+      return false;
+    });
+}
+
+/* PROBLEMA 7 — manha / tarde / noite. Uma barbearia de 9h as 19h de 30
+   em 30 min gera 20 botoes iguais em fila. Agrupar e o que torna isso
+   varrivel no celular. O corte e por hora cheia, nao por regra de
+   negocio: nao inventa expediente que o servidor nao mandou. */
+function turnoDe(h){
+  var hh = parseInt(String(h).slice(0,2), 10);
+  if (hh < 12) return 'Manhã';
+  if (hh < 18) return 'Tarde';
+  return 'Noite';
+}
+function montarHoras(){
+  var alvo = $('#lista-horas'); alvo.innerHTML = '';
+  esconder('#p-voce');
+  if (!disp || !esc.dia) return;
+  /* mesma filtragem de sempre: tira ocupado e tira o que ja passou */
+  var ocup = (disp.ocupados && disp.ocupados[esc.dia.data]) || {};
+  var livres = (disp.slotsPadrao || []).filter(function(h){
+    if (ocup[h]) return false;
+    if (esc.dia.data === disp.hoje && disp.agora && h <= disp.agora) return false;
+    return true;
+  });
+  $('#sem-hora').hidden = livres.length > 0;
+  if (!livres.length) return;
+
+  var ordem = ['Manhã','Tarde','Noite'], grupos = {};
+  livres.forEach(function(h){ (grupos[turnoDe(h)] = grupos[turnoDe(h)] || []).push(h); });
+  ordem.forEach(function(nome){
+    if (!grupos[nome]) return;
+    var cx = document.createElement('div'); cx.className = 'turno';
+    var u = document.createElement('u'); u.textContent = nome; cx.appendChild(u);
+    var g = document.createElement('div'); g.className = 'horas';
+    grupos[nome].forEach(function(h){
+      var b = botao('hora', txt(h), function(el){
+        calar();
+        alvo.querySelectorAll('.hora').forEach(function(o){ o.setAttribute('aria-pressed','false'); });
+        el.setAttribute('aria-pressed','true');
+        esc.hora = h;
+        linhaFeita('#f-quando', 'Quando', esc.dia.label + ' às ' + h, voltarQuando);
+        esconder('#p-quando');
+        mostrar('#p-voce'); passoAtual(temPasso2 ? 4 : 3);
+        montarResumo(); barra(); rolar('#p-voce');
+      });
+      b.setAttribute('aria-pressed', esc.hora === h ? 'true' : 'false');
+      g.appendChild(b);
+    });
+    cx.appendChild(g); alvo.appendChild(cx);
+  });
+}
+function voltarQuando(){
+  calar();
+  esconder('#f-quando','#p-voce');
+  mostrar('#p-quando'); passoAtual(temPasso2 ? 3 : 2);
+  esc.hora = null; barra();
+}
+
+function montarResumo(){
+  $('#resumo').innerHTML =
+      '<div><span>Serviço</span><b>' + txt(esc.servico.nome) + '</b></div>'
+    + '<div><span>Profissional</span><b>' + txt(esc.prof ? esc.prof.nome : 'quem estiver livre') + '</b></div>'
+    + '<div><span>Quando</span><b>' + txt(esc.dia.label) + ' às ' + txt(esc.hora) + '</b></div>'
+    + '<div><span>Duração</span><b>' + (Number(esc.servico.duracao)||30) + ' min</b></div>'
+    + '<div class="total"><span>Total</span><b>' + moeda(esc.servico.preco) + '</b></div>';
+}
+
+/* ══ 6. SEUS DADOS ══════════════════════════════════════════════════
+   PROBLEMA 6 — o nome e o telefone ficam NO APARELHO, e so nele.
+   Nada e mandado para o servidor por causa disso: nenhuma chamada
+   nova, nenhum cadastro de cliente, nenhum cracha. O ganho de nao
+   redigitar vem inteiro do localStorage. */
+var MEM = 'aloco_ag_' + SLUG;
+function lembrar(){
+  try {
+    var v = JSON.parse(localStorage.getItem(MEM) || 'null');
+    if (!v) return;
+    if (v.nome) $('#f-nome').value = v.nome;
+    if (v.tel)  $('#f-tel').value  = v.tel;
+  } catch(e){}
+}
+function guardar(nome, tel){
+  try { localStorage.setItem(MEM, JSON.stringify({ nome:nome, tel:tel })); } catch(e){}
+}
+
+$('#f-tel').addEventListener('input', function(){
+  var d = this.value.replace(/\D/g,'').slice(0,11), s = '';
+  if (d.length)      s = '(' + d.slice(0,2);
+  if (d.length >= 3) s += ') ' + d.slice(2, d.length > 10 ? 7 : 6);
+  if (d.length >= 7) s += '-' + d.slice(d.length > 10 ? 7 : 6);
+  this.value = s;
+});
+
+/* ══ 7. CONFIRMAR ═══════════════════════════════════════════════════ */
+var ERROS = {
+  horario_ocupado:      'Esse horário acabou de ser preenchido. Escolha outro, por favor.',
+  periodo_com_agendamento: 'Esse período já tem agendamento.',
+  horario_no_passado:   'Esse horário já passou. Escolha outro.',
+  data_no_passado:      'Esse dia já passou. Escolha outro.',
+  fora_do_expediente:   'Esse horário está fora do expediente da barbearia.',
+  dia_fechado:          'A barbearia não abre nesse dia.',
+  profissional_invalido:'Esse profissional não está mais disponível. Escolha outro.',
+  agenda_desligada:     'Esta barbearia está atendendo por ordem de chegada, sem hora marcada.',
+  tente_novamente:      'Muita gente agendando agora. Tente de novo em instantes.'
+};
+/* PROBLEMA 3 — a mensagem do servidor vem primeiro. Ele sabe o que
+   aconteceu; esta pagina nao. So inventa texto quando ele nao mandou. */
+function recadoDoServidor(r){
+  if (r && r.mensagem) return String(r.mensagem);
+  if (r && r.erro && ERROS[r.erro]) return ERROS[r.erro];
+  return 'Não consegui agendar. Tente outro horário.';
+}
+
+function enviar(bt){
+  var nome = $('#f-nome').value.trim();
+  var tel  = $('#f-tel').value.replace(/\D/g,'');
+  return fetch(API, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({ action:'agendar', b:SLUG,
+      data: esc.dia.data, horario: esc.hora, cliente: nome, telefone: tel,
+      servico: esc.servico.nome, barbeiro: esc.prof ? esc.prof.nome : '',
+      valor: Number(esc.servico.preco) || 0 }) })
+    .then(function(r){ return r.json(); });
+}
+
+function ics(){
+  /* arquivo de calendario montado no proprio aparelho. Nao e integracao:
+     e um texto com um data: na frente. */
+  function z(n){ return (n < 10 ? '0' : '') + n; }
+  var p = String(esc.dia.data).split('-'), h = String(esc.hora).split(':');
+  var ini = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]), Number(h[0]), Number(h[1]));
+  var fim = new Date(ini.getTime() + (Number(esc.servico.duracao) || 30) * 60000);
+  function f(d){
+    return d.getUTCFullYear() + z(d.getUTCMonth()+1) + z(d.getUTCDate()) + 'T'
+         + z(d.getUTCHours()) + z(d.getUTCMinutes()) + '00Z';
+  }
+  function esc2(s){ return String(s||'').replace(/([,;\\])/g,'\\$1').replace(/\n/g,'\\n'); }
+  var txtIcs = [
+    'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Barber IA Pro//PT-BR','BEGIN:VEVENT',
+    'UID:' + Date.now() + '@barber-ia.pro',
+    'DTSTAMP:' + f(new Date()), 'DTSTART:' + f(ini), 'DTEND:' + f(fim),
+    'SUMMARY:' + esc2(esc.servico.nome + ' — ' + loja.nome),
+    'DESCRIPTION:' + esc2('Agendado em barber-ia.pro'),
+    'END:VEVENT','END:VCALENDAR'
+  ].join('\r\n');
+  return 'data:text/calendar;charset=utf-8,' + encodeURIComponent(txtIcs);
+}
+
+function concluir(nome){
+  esconder('#f-servico','#f-prof','#f-quando','#p-servico','#p-prof','#p-quando','#p-voce');
+  $('#barra').classList.remove('on');
+  $('#resumo-final').innerHTML = $('#resumo').innerHTML
+    + '<div><span>Em nome de</span><b>' + txt(nome) + '</b></div>';
+  if (loja.whatsapp){
+    var z = $('#link-zap');
+    z.href = 'https://wa.me/' + encodeURIComponent(loja.whatsapp)
+           + '?text=' + encodeURIComponent('Oi! Acabei de agendar ' + esc.servico.nome
+             + ' para ' + esc.dia.label + ' as ' + esc.hora + '.');
+    z.hidden = false;
+  }
+  try { $('#link-ics').href = ics(); } catch(e){ $('#link-ics').hidden = true; }
+  passoAtual(temPasso2 ? 4 : 3);
+  mostrar('#p-feito');
+  try { window.scrollTo({ top:0, behavior:'smooth' }); } catch(e){}
+}
+
+$('#confirmar').addEventListener('click', function(){
+  calar();
+  var bt = this;
+  var nome = $('#f-nome').value.trim();
+  var tel  = $('#f-tel').value.replace(/\D/g,'');
+  if (nome.length < 2)  return falar('Escreva o seu nome.');
+  if (tel.length < 10)  return falar('Confira o WhatsApp — precisa ter DDD.');
+  if (!esc.servico || !esc.dia || !esc.hora) return falar('Escolha o serviço, o dia e o horário.');
+
+  bt.disabled = true; bt.textContent = 'Agendando…';
+  function solta(){ bt.disabled = false; bt.textContent = 'Confirmar agendamento'; }
+
+  /* PROBLEMA 4, primeira metade — se a lista esta velha, confere ANTES
+     de gravar. Quem deixou a aba aberta meia hora nao manda um horario
+     que ja foi embora. A decisao continua sendo do servidor; isto so
+     evita a ida inutil. */
+  var antes = (Date.now() - dispEm > VALIDADE) ? buscarDias(true) : Promise.resolve(true);
+
+  antes.then(function(){
+    var ocup = (disp && disp.ocupados && disp.ocupados[esc.dia.data]) || {};
+    if (ocup[esc.hora]){
+      solta(); montarHoras(); esconder('#f-quando','#p-voce'); mostrar('#p-quando');
+      passoAtual(temPasso2 ? 3 : 2);
+      falar('Esse horário acabou de ser preenchido. Escolha outro, por favor.');
+      rolar('#p-quando');
+      return;
+    }
+    return enviar(bt).then(function(r){
+      solta();
+      if (!r || !r.ok){
+        falar(recadoDoServidor(r));
+        /* PROBLEMA 4, segunda metade — quando o motivo e o horario,
+           busca a agenda de novo e repinta. Antes o cliente voltava
+           para a mesma lista errada e tentava o mesmo horario. */
+        var porHorario = r && (r.ocupado || r.erro === 'horario_ocupado'
+                        || r.erro === 'horario_no_passado' || r.erro === 'data_no_passado'
+                        || r.erro === 'fora_do_expediente' || r.erro === 'dia_fechado');
+        if (porHorario){
+          esc.hora = null;
+          esconder('#f-quando','#p-voce'); mostrar('#p-quando');
+          passoAtual(temPasso2 ? 3 : 2);
+          buscarDias(true); barra(); rolar('#p-quando');
+        }
+        return;
+      }
+      guardar(nome, $('#f-tel').value);
+      concluir(nome);
+    });
+  }).catch(function(){
+    solta();
+    falar('Não consegui falar com a agenda. Tente de novo.');
+  });
+});
+</script>
+</body>
+</html>
