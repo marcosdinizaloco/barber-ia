@@ -840,6 +840,15 @@ $('#confirmar').addEventListener('click', function(){
   enviando = true;
   bt.disabled = true; bt.textContent = 'Agendando…';
   var demora = null;
+  /* o aviso dos 20s ja foi dado? Muda o que dizer se a conexao cair
+     depois dele: ai o agendamento PODE ter sido gravado, e mandar
+     "tente de novo" e convidar a duplicata. */
+  var avisou = false;
+  /* o servidor ja disse que gravou? A partir daqui, qualquer erro e
+     NOSSO, de pintar a tela — nao do agendamento. Dizer "falhou"
+     mandaria a pessoa agendar de novo em cima de um horario que ja e
+     dela. */
+  var confirmado = false;
   function solta(){
     if (demora){ clearTimeout(demora); demora = null; }
     enviando = false;
@@ -865,6 +874,7 @@ $('#confirmar').addEventListener('click', function(){
        da agenda acima nao pode disparar um aviso de "nao confirmado"
        quando ainda nao se mandou nada. */
     demora = setTimeout(function(){
+      avisou = true;
       bt.textContent = 'Aguardando resposta…';
       falar('O agendamento ainda NÃO foi confirmado — a agenda está demorando para responder. '
           + 'Não envie de novo: confira com a barbearia se o seu horário entrou antes de tentar outra vez.');
@@ -888,12 +898,23 @@ $('#confirmar').addEventListener('click', function(){
         }
         return;
       }
+      /* ponto exato em que o agendamento existe: o servidor respondeu
+         ok. O que vem depois e so tela. */
+      confirmado = true;
       guardar(nome, $('#f-tel').value);
       concluir(nome);
     });
   }).catch(function(){
+    /* agendamento ja gravado: o erro e de tela. Nao fala em falha e
+       nao convida a repetir. O botao ja foi solto la em cima. */
+    if (confirmado) return;
+    /* le a bandeira ANTES do solta, que limpa o estado do envio */
+    var passouDoAviso = avisou;
     solta();
-    falar('Não consegui falar com a agenda. Tente de novo.');
+    falar(passouDoAviso
+      ? 'A conexão caiu enquanto a agenda respondia. O seu horário PODE ter sido gravado — '
+        + 'confira com a barbearia antes de agendar de novo.'
+      : 'Não consegui falar com a agenda. Tente de novo.');
   });
 });
 </script>
