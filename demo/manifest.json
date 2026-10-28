@@ -1,0 +1,8 @@
+{
+  "name": "Barber IA Pro — Demonstração",
+  "short_name": "Demo BIA",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0B0D10",
+  "theme_color": "#0B0D10"
+}

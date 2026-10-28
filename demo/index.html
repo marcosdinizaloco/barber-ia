@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Demonstração · Barber IA Pro</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0B0D10">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --noite:#0B0D10; --noite-2:#12161B; --noite-3:#171C23;
+  --linha:#232A33; --linha-2:#2E3741;
+  --giz:#EDEAE4; --giz-2:#A7A39B; --giz-3:#6B6862;
+  --azul:#0097FD; --azul-2:#5CBBFF; --ok:#3CCB7F; --ambar:#F2A541;
+  --d:'Big Shoulders Display',Impact,sans-serif;
+  --t:'Figtree',system-ui,-apple-system,sans-serif;
+  --m:'JetBrains Mono',ui-monospace,monospace;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--noite);color:var(--giz);font-family:var(--t);
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  padding:0 0 env(safe-area-inset-bottom)}
+:focus-visible{outline:2px solid var(--azul-2);outline-offset:2px;border-radius:8px}
+.wrap{max-width:480px;margin:0 auto;padding:18px 16px 40px}
+
+header{display:flex;align-items:baseline;gap:8px;padding:4px 0 18px}
+.logo{font-family:var(--d);font-weight:900;font-size:23px}
+.logo i{font-style:normal;color:var(--azul-2)}
+.logo span{font-family:var(--m);font-size:9px;font-weight:700;letter-spacing:.2em;
+  color:var(--giz-3);text-transform:uppercase}
+.tag{margin-left:auto;font-family:var(--m);font-size:9.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--giz-3);border:1px solid var(--linha-2);
+  border-radius:999px;padding:4px 10px}
+
+h1{font-family:var(--d);font-size:34px;font-weight:800;line-height:.98;margin:0 0 8px}
+.sub{color:var(--giz-2);font-size:15px;margin:0 0 22px}
+
+label{display:block;font-family:var(--m);font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--giz-3);margin:0 0 7px}
+input,textarea,select{width:100%;background:var(--noite-2);color:var(--giz);
+  border:1px solid var(--linha);border-radius:11px;padding:13px 14px;
+  font-family:var(--t);font-size:16px;line-height:1.5;appearance:none}
+input:focus,textarea:focus{border-color:var(--azul);outline:none}
+textarea{min-height:230px;font-family:var(--m);font-size:13.5px;line-height:1.62;
+  resize:vertical;white-space:pre-wrap}
+.campo{margin-bottom:16px}
+.dupla{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dica{font-size:12.5px;color:var(--giz-3);margin:7px 0 0}
+
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.chip{display:flex;align-items:center;justify-content:center;text-align:center;
+  min-height:52px;padding:10px 12px;border:1px solid var(--linha);border-radius:12px;
+  background:var(--noite-2);color:var(--giz-2);font-size:13.5px;font-weight:600;
+  cursor:pointer;transition:border-color .16s,background .16s,color .16s}
+.chip.on{border-color:var(--azul);background:rgba(0,151,253,.12);color:var(--giz)}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;
+  border:1px solid transparent;border-radius:12px;padding:16px;font-weight:700;
+  font-size:16px;cursor:pointer;font-family:var(--t);
+  transition:background .16s,transform .16s,opacity .16s}
+.btn-p{background:var(--azul);color:#fff}
+.btn-p:active{transform:scale(.99)}
+.btn-p:disabled{opacity:.45;cursor:default}
+.btn-g{background:transparent;color:var(--giz-2);border-color:var(--linha-2);
+  font-weight:600;font-size:14px;padding:12px}
+
+.aviso{border-radius:12px;padding:13px 15px;font-size:14px;margin:0 0 16px;
+  display:none;line-height:1.5}
+.aviso.on{display:block}
+.aviso.ok{background:rgba(60,203,127,.1);border:1px solid rgba(60,203,127,.4);color:#8BE3B4}
+.aviso.er{background:rgba(242,165,65,.1);border:1px solid rgba(242,165,65,.4);color:#F3C688}
+.aviso.nt{background:var(--noite-2);border:1px solid var(--linha);color:var(--giz-2)}
+
+.bts{margin:12px 0 0;border:1px solid var(--linha);border-radius:11px;overflow:hidden;
+  background:var(--noite-2)}
+.bts div{padding:11px 14px;border-bottom:1px solid var(--linha);font-size:13.5px;
+  color:var(--azul-2);text-align:center;font-weight:600}
+.bts div:last-child{border-bottom:0}
+.bts-t{font-family:var(--m);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--giz-3);margin:16px 0 0}
+
+.rodape{margin-top:26px;padding-top:18px;border-top:1px solid var(--linha);
+  font-size:12.5px;color:var(--giz-3);line-height:1.6}
+.sair{background:none;border:0;color:var(--giz-3);font-size:12.5px;
+  text-decoration:underline;cursor:pointer;padding:0;font-family:var(--t)}
+#porta{display:none}
+#porta.on{display:block}
+#app{display:none}
+#app.on{display:block}
+.carregando{opacity:.5;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">Barber<i>IA</i> <span>Pro</span></div>
+    <div class="tag">Demonstração</div>
+  </header>
+
+  <!-- ── porta ───────────────────────────────────────────── -->
+  <section id="porta">
+    <h1>Entrar</h1>
+    <p class="sub">Esta página manda WhatsApp. Só abre com a chave.</p>
+    <div class="aviso er" id="porta-erro"></div>
+    <form id="form-porta">
+      <div class="campo">
+        <label for="chave">Chave da demonstração</label>
+        <input id="chave" type="password" autocomplete="current-password"
+               inputmode="text" placeholder="•••••••">
+      </div>
+      <button class="btn btn-p" type="submit">Entrar</button>
+    </form>
+    <p class="rodape">A chave fica guardada neste aparelho. Se ele não for seu,
+      saia pelo botão no fim da página quando terminar.</p>
+  </section>
+
+  <!-- ── app ─────────────────────────────────────────────── -->
+  <section id="app">
+    <h1>Mandar a demonstração</h1>
+    <p class="sub">Põe o número de quem está na sua frente, escolhe a mensagem
+      e mostra chegando no celular dele.</p>
+
+    <div class="aviso" id="msg"></div>
+
+    <div class="campo">
+      <label>Qual mensagem</label>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="campo dupla">
+      <div>
+        <label for="loja">Nome da barbearia</label>
+        <input id="loja" type="text" placeholder="Barbearia do João" maxlength="40">
+      </div>
+      <div>
+        <label for="dono">Nome do dono</label>
+        <input id="dono" type="text" placeholder="João" maxlength="20">
+      </div>
+    </div>
+
+    <div class="campo">
+      <label for="fone">Celular de quem vai receber</label>
+      <input id="fone" type="tel" inputmode="numeric" placeholder="(79) 99999-9999"
+             autocomplete="off">
+      <p class="dica">Com DDD. Peça a pessoa confirmar antes de mandar.</p>
+    </div>
+
+    <div class="campo">
+      <label for="texto">A mensagem — pode editar antes de mandar</label>
+      <textarea id="texto" spellcheck="false"></textarea>
+      <p class="dica">*asterisco* deixa em negrito no WhatsApp.</p>
+    </div>
+
+    <div id="caixa-bts" style="display:none">
+      <p class="bts-t">Botões que vão junto</p>
+      <div class="bts" id="bts"></div>
+    </div>
+
+    <div style="margin-top:22px">
+      <button class="btn btn-p" id="enviar">Mandar agora</button>
+    </div>
+    <div style="margin-top:10px">
+      <button class="btn btn-g" id="recarregar" type="button">Recarregar a mensagem original</button>
+    </div>
+
+    <p class="rodape">
+      Mande só para quem concordou em receber. Há um teto de envios por hora.
+      Os nomes e valores da mensagem são inventados — nenhum cliente real aparece.
+      <br><br>
+      <button class="sair" id="sair">Sair e apagar a chave deste aparelho</button>
+    </p>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var API = 'https://script.google.com/macros/s/AKfycbwjH7c69qlBz58Cuy0c23Yq7kSC-4PpohEqQCpKUy4gAb6Q1Syzqp-hxVra00wRr7RhiQ/exec';
+  var K = 'bia_demo_chave';
+
+  var $ = function(id){ return document.getElementById(id); };
+  var porta = $('porta'), app = $('app');
+  var chave = '';
+  var tipo = 'resumo';
+  var pedindo = null;
+
+  function guardado(){ try { return localStorage.getItem(K) || ''; } catch(e){ return ''; } }
+  function guardar(v){ try { localStorage.setItem(K, v); } catch(e){} }
+  function esquecer(){ try { localStorage.removeItem(K); } catch(e){} }
+
+  function post(acao, extra){
+    var corpo = { action:acao, chave:chave };
+    for (var k in (extra||{})) corpo[k] = extra[k];
+    return fetch(API, { method:'POST', body:JSON.stringify(corpo) })
+      .then(function(r){ return r.json(); });
+  }
+
+  function aviso(txt, classe){
+    var el = $('msg');
+    el.textContent = txt;
+    el.className = 'aviso on ' + (classe || 'nt');
+    if (classe === 'ok') setTimeout(function(){ el.className = 'aviso'; }, 6000);
+  }
+
+  /* ── porta ─────────────────────────────────────────────── */
+  $('form-porta').addEventListener('submit', function(e){
+    e.preventDefault();
+    var v = $('chave').value.trim();
+    if (!v) return;
+    chave = v;
+    var er = $('porta-erro');
+    er.className = 'aviso';
+    post('demo_catalogo', {}).then(function(j){
+      /* o catalogo e publico; quem valida a chave e a previa */
+      return post('demo_previa', { tipo:'resumo', loja:'', dono:'' }).then(function(p){
+        if (!p || !p.ok){
+          er.textContent = 'Chave não confere.';
+          er.className = 'aviso on er';
+          chave = '';
+          return;
+        }
+        guardar(v);
+        abrir(j && j.itens);
+      });
+    }).catch(function(){
+      er.textContent = 'Sem conexão com o servidor.';
+      er.className = 'aviso on er';
+    });
+  });
+
+  function abrir(itens){
+    porta.className = '';
+    app.className = 'on';
+    montarChips(itens || [
+      {id:'resumo', nome:'Resumo do dia (com botões)'},
+      {id:'vaga',   nome:'Vaga que abriu'},
+      {id:'agenda', nome:'Aviso de agendamento novo'},
+      {id:'aniver', nome:'Parabéns de aniversário'}
+    ]);
+    previa();
+  }
+
+  function montarChips(itens){
+    var c = $('chips');
+    c.innerHTML = '';
+    itens.forEach(function(it, i){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip' + (i === 0 ? ' on' : '');
+      b.textContent = it.nome;
+      b.setAttribute('data-id', it.id);
+      b.addEventListener('click', function(){
+        tipo = it.id;
+        [].slice.call(c.children).forEach(function(x){ x.className = 'chip'; });
+        b.className = 'chip on';
+        previa();
+      });
+      c.appendChild(b);
+    });
+  }
+
+  /* ── previa ────────────────────────────────────────────── */
+  function previa(){
+    var ta = $('texto');
+    ta.classList.add('carregando');
+    clearTimeout(pedindo);
+    pedindo = setTimeout(function(){
+      post('demo_previa', { tipo:tipo, loja:$('loja').value, dono:$('dono').value,
+                            fone:$('fone').value })
+        .then(function(j){
+          ta.classList.remove('carregando');
+          if (!j || !j.ok){ aviso(erroEmPortugues(j), 'er'); return; }
+          ta.value = j.texto || '';
+          pintarBotoes(j.botoes || []);
+        })
+        .catch(function(){ ta.classList.remove('carregando'); aviso('Sem conexão.', 'er'); });
+    }, 260);
+  }
+
+  function pintarBotoes(lista){
+    var caixa = $('caixa-bts'), el = $('bts');
+    if (!lista.length){ caixa.style.display = 'none'; return; }
+    el.innerHTML = '';
+    lista.forEach(function(r){
+      var d = document.createElement('div');
+      d.textContent = r;
+      el.appendChild(d);
+    });
+    caixa.style.display = 'block';
+  }
+
+  ['loja','dono'].forEach(function(id){
+    $(id).addEventListener('input', previa);
+  });
+  $('recarregar').addEventListener('click', previa);
+
+  /* mascara simples do telefone */
+  $('fone').addEventListener('input', function(){
+    var d = this.value.replace(/\D/g, '').slice(0, 11);
+    var s = d;
+    if (d.length > 2)  s = '(' + d.slice(0,2) + ') ' + d.slice(2);
+    if (d.length > 7)  s = '(' + d.slice(0,2) + ') ' + d.slice(2,7) + '-' + d.slice(7);
+    this.value = s;
+  });
+
+  /* ── enviar ────────────────────────────────────────────── */
+  $('enviar').addEventListener('click', function(){
+    var b = this;
+    var fone = $('fone').value.replace(/\D/g, '');
+    if (fone.length < 10){ aviso('Falta o celular, com DDD.', 'er'); $('fone').focus(); return; }
+    var txt = $('texto').value.trim();
+    if (!txt){ aviso('A mensagem está vazia.', 'er'); return; }
+
+    b.disabled = true;
+    b.textContent = 'Mandando...';
+    post('demo_enviar', { tipo:tipo, loja:$('loja').value, dono:$('dono').value,
+                          fone:fone, texto:txt })
+      .then(function(j){
+        b.disabled = false;
+        b.textContent = 'Mandar agora';
+        if (!j || !j.ok){ aviso(erroEmPortugues(j), 'er'); return; }
+        if (j.seco){ aviso('Modo seco ligado no servidor: nada foi enviado.', 'nt'); return; }
+        aviso('Enviado. Peça para ela olhar o WhatsApp.'
+              + (j.restam >= 0 ? (' Restam ' + j.restam + ' envios nesta hora.') : ''), 'ok');
+      })
+      .catch(function(){
+        b.disabled = false;
+        b.textContent = 'Mandar agora';
+        aviso('Sem conexão. Tente de novo.', 'er');
+      });
+  });
+
+  function erroEmPortugues(j){
+    var e = (j && j.erro) || '';
+    if (e === 'chave_invalida')  return 'A chave deixou de valer. Saia e entre de novo.';
+    if (e === 'numero_invalido') return 'Esse número não parece um celular brasileiro.';
+    if (e === 'teto_da_hora')    return 'Você bateu o teto de envios desta hora. Tente mais tarde.';
+    if (e === 'texto_longo')     return 'A mensagem ficou grande demais.';
+    if (e === 'zapi_sem_chave')  return 'O WhatsApp não está configurado no servidor.';
+    return 'Não deu certo' + (e ? (': ' + e) : '') + '.';
+  }
+
+  $('sair').addEventListener('click', function(){
+    esquecer();
+    location.reload();
+  });
+
+  /* ── inicio ────────────────────────────────────────────── */
+  var salva = guardado();
+  if (salva){
+    chave = salva;
+    post('demo_previa', { tipo:'resumo', loja:'', dono:'' }).then(function(p){
+      if (p && p.ok){ abrir(null); }
+      else { esquecer(); chave=''; porta.className = 'on'; }
+    }).catch(function(){ porta.className = 'on'; });
+  } else {
+    porta.className = 'on';
+  }
+})();
+</script>
+</body>
+</html>
