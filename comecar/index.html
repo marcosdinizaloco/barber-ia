@@ -256,6 +256,151 @@ footer{border-top:1px solid var(--linha);padding:20px 0 40px;color:var(--giz-2);
 .resto.ver{display:block}
 .mais{background:none;border:0;color:var(--azul);font:600 14px var(--texto);cursor:pointer;
   padding:4px 0 14px;text-decoration:underline;text-underline-offset:3px}
+
+/* ══════════ SECAO VOZ ══════════ (tudo com prefixo v- para nao
+   encostar nas classes que a pagina ja usa: ficha, nota, dica, palco) */
+.v-sec{padding:86px 0 96px;position:relative;overflow:hidden;border-top:1px solid var(--linha)}
+.v-sec:before{content:"";position:absolute;left:50%;top:-6%;width:1100px;height:680px;
+  transform:translateX(-50%);z-index:0;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(0,151,253,.15),transparent 70%);filter:blur(30px)}
+.v-sec > *{position:relative;z-index:1}
+.v-olho{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--azul-2);margin:0 0 16px;
+  padding:6px 12px;border:1px solid rgba(0,151,253,.3);border-radius:999px;background:rgba(0,151,253,.07)}
+.v-olho s{width:6px;height:6px;border-radius:50%;background:var(--azul);text-decoration:none;
+  box-shadow:0 0 10px var(--azul);animation:v-pulso 2s ease-in-out infinite}
+@keyframes v-pulso{0%,100%{opacity:1}50%{opacity:.3}}
+.v-h2{font-family:var(--display);font-weight:900;text-transform:uppercase;
+  font-size:clamp(38px,6.4vw,62px);line-height:.92;letter-spacing:-.6px;margin:0 0 16px;
+  text-wrap:balance;max-width:16ch}
+.v-h2 em{font-style:normal;color:var(--azul);text-shadow:0 0 44px rgba(0,151,253,.5)}
+.v-sub{color:var(--giz-2);font-size:clamp(15px,2.4vw,18px);line-height:1.55;margin:0 0 44px;max-width:52ch}
+.v-sub b{color:var(--giz);font-weight:600}
+.v-palco{display:grid;gap:40px;align-items:center}
+@media(min-width:960px){.v-palco{grid-template-columns:376px 1fr;gap:64px}}
+.v-fone{position:relative;width:min(336px,84vw);margin:0 auto;border-radius:40px;
+  background:linear-gradient(160deg,#30353C,#161A1F 38%,#0D1115);padding:10px;
+  box-shadow:0 0 0 1px #000,0 1px 0 rgba(255,255,255,.16) inset,
+             0 46px 86px rgba(0,0,0,.72),0 0 100px rgba(0,151,253,.13);
+  transform:perspective(1400px) rotateY(-10deg) rotateX(2.5deg)}
+.v-tela{position:relative;border-radius:31px;overflow:hidden;background:#0A0D11;
+  aspect-ratio:9/18.2;display:flex;flex-direction:column}
+.v-ilha{position:absolute;left:50%;top:10px;transform:translateX(-50%);width:31%;height:17px;
+  background:#000;border-radius:14px;z-index:9}
+.v-app{flex:1;display:flex;flex-direction:column;min-height:0}
+.v-at{padding:30px 15px 11px;border-bottom:1px solid var(--linha)}
+.v-at .v-l1{display:flex;align-items:center;gap:8px}
+.v-at .v-mar{width:22px;height:22px;border-radius:7px;flex:none;
+  background:linear-gradient(145deg,#12324F,#071722);border:1px solid #1D4A6E}
+.v-at b{font:800 13px var(--display);letter-spacing:.5px;text-transform:uppercase}
+.v-at b i{font-style:normal;color:var(--azul)}
+.v-at .v-l2{margin-top:9px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--giz-2)}
+.v-ac{flex:1;padding:12px 13px 72px;display:flex;flex-direction:column;gap:7px;overflow:hidden}
+.v-lin{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;
+  background:var(--noite-2);border:1px solid var(--linha)}
+.v-lin .v-h{font-family:var(--mono);font-size:11px;color:var(--azul);width:38px;flex:none;font-weight:500}
+.v-lin .v-q{flex:1;min-width:0}
+.v-lin .v-q b{display:block;font:600 12.5px var(--texto);color:var(--giz);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-lin .v-q span{display:block;font-size:10.5px;color:var(--giz-2);margin-top:1px}
+.v-lin.v-nova{border-color:rgba(60,203,127,.5);background:#0D1A14;
+  animation:v-surge .6s cubic-bezier(.2,1.3,.4,1) both}
+.v-lin.v-nova .v-h{color:var(--ok)}
+.v-lin.v-nova .v-q b:after{content:"novo";margin-left:7px;font-family:var(--mono);font-size:8px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ok);background:rgba(60,203,127,.14);
+  padding:2px 5px;border-radius:5px;vertical-align:middle}
+@keyframes v-surge{from{opacity:0;transform:translateY(-10px) scale(.97)}to{opacity:1;transform:none}}
+.v-fab{position:absolute;right:14px;bottom:16px;z-index:6;width:58px;height:58px;border-radius:50%;
+  border:0;cursor:pointer;display:grid;place-items:center;
+  background:radial-gradient(120% 120% at 32% 22%,#5CBBFF 0%,#0097FD 46%,#006FBE 100%);
+  animation:v-chama 2.8s ease-out infinite;transition:transform .15s}
+.v-fab:hover{transform:scale(1.06)}
+.v-fab:active{transform:scale(.95)}
+.v-fab svg{width:25px;height:25px;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+@keyframes v-chama{0%{box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 10px 22px rgba(0,0,0,.55),0 0 0 0 rgba(0,151,253,.55)}
+  70%{box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 10px 22px rgba(0,0,0,.55),0 0 0 20px rgba(0,151,253,0)}
+  100%{box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 10px 22px rgba(0,0,0,.55),0 0 0 0 rgba(0,151,253,0)}}
+.v-convite{position:absolute;right:76px;bottom:30px;z-index:7;display:flex;align-items:center;gap:8px;
+  animation:v-balanca 1.9s ease-in-out infinite}
+.v-convite b{white-space:nowrap;font:700 12.5px var(--texto);color:#06202E;background:#FFD66B;
+  padding:7px 12px;border-radius:999px;box-shadow:0 6px 16px rgba(0,0,0,.45)}
+.v-convite svg{width:26px;height:26px;color:#FFD66B;flex:none}
+@keyframes v-balanca{0%,100%{transform:translateX(0)}50%{transform:translateX(-7px)}}
+.v-convite.v-some{opacity:0;pointer-events:none;transition:opacity .25s}
+.v-modal{position:absolute;inset:0;z-index:8;background:rgba(0,0,0,.74);
+  display:flex;flex-direction:column;justify-content:flex-end;padding:9px;
+  opacity:0;pointer-events:none;transition:opacity .25s}
+.v-modal.v-ver{opacity:1;pointer-events:auto}
+.v-cx{background:#11151A;border:1px solid var(--linha);border-radius:20px;padding:15px 14px 16px;
+  transform:translateY(16px);transition:transform .3s cubic-bezier(.2,.9,.3,1);max-height:88%;
+  overflow:hidden;display:flex;flex-direction:column}
+.v-modal.v-ver .v-cx{transform:none}
+.v-ct{display:flex;align-items:center;gap:7px;margin-bottom:12px}
+.v-ct b{font:600 13px var(--texto);flex:1}
+.v-ct s{width:7px;height:7px;border-radius:50%;background:var(--azul);text-decoration:none}
+.v-ct i{font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--giz-2)}
+.v-micg{width:92px;height:92px;border-radius:50%;margin:8px auto 0;border:0;cursor:pointer;
+  display:grid;place-items:center;
+  background:radial-gradient(120% 120% at 32% 22%,#5CBBFF 0%,#0097FD 46%,#006FBE 100%);
+  animation:v-chama2 2.4s ease-out infinite}
+.v-micg svg{width:38px;height:38px}
+@keyframes v-chama2{0%{box-shadow:0 14px 30px rgba(0,0,0,.5),0 0 0 0 rgba(0,151,253,.5)}
+  70%{box-shadow:0 14px 30px rgba(0,0,0,.5),0 0 0 28px rgba(0,151,253,0)}
+  100%{box-shadow:0 14px 30px rgba(0,0,0,.5),0 0 0 0 rgba(0,151,253,0)}}
+.v-dica{text-align:center;font-size:12px;color:var(--giz-2);line-height:1.5;margin:13px 2px 2px}
+.v-dica b{color:var(--giz)}
+.v-onda{display:flex;align-items:center;justify-content:center;gap:3px;height:48px;margin-top:6px}
+.v-onda i{display:block;width:4px;border-radius:3px;background:var(--azul);height:9px;
+  animation:v-eq .62s ease-in-out infinite alternate}
+.v-onda i:nth-child(2n){animation-duration:.46s}
+.v-onda i:nth-child(3n){animation-duration:.78s;background:var(--azul-2)}
+@keyframes v-eq{from{transform:scaleY(.25)}to{transform:scaleY(3)}}
+.v-falando{font-size:13px;line-height:1.5;color:var(--giz);text-align:center;margin:4px 2px 0;min-height:56px}
+.v-falando:after{content:"\275A";color:var(--azul);animation:v-piscar 1s step-end infinite}
+.v-falando.v-fim:after{content:""}
+@keyframes v-piscar{50%{opacity:0}}
+.v-pensa{display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px 0 6px}
+.v-aro{width:34px;height:34px;border:3px solid rgba(0,151,253,.2);border-top-color:var(--azul);
+  border-radius:50%;animation:v-roda .8s linear infinite}
+@keyframes v-roda{to{transform:rotate(360deg)}}
+.v-voce{font-size:11px;color:var(--giz-2);line-height:1.5;background:#0B0F13;
+  border:1px solid var(--linha);border-radius:9px;padding:8px 10px;margin-bottom:9px}
+.v-voce span{color:var(--giz);font-style:italic}
+.v-tit{font:700 12.5px var(--texto);color:var(--giz);margin-bottom:7px}
+.v-campos{background:#0B0F13;border:1px solid var(--linha);border-radius:11px;overflow:hidden;overflow-y:auto}
+.v-ln{display:flex;align-items:center;gap:9px;padding:8px 11px;border-bottom:1px solid #171C22;
+  opacity:0;transform:translateY(6px)}
+.v-ln:last-child{border-bottom:0}
+.v-ln.v-ver{animation:v-entra .34s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes v-entra{to{opacity:1;transform:none}}
+.v-ln u{text-decoration:none;font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--giz-2);width:56px;flex:none}
+.v-ln b{font:600 12.5px var(--texto);color:var(--giz)}
+.v-pronto{width:100%;margin-top:11px;padding:13px;border:0;border-radius:12px;background:var(--azul);
+  color:#02202F;font-family:var(--display);font-weight:900;font-size:18px;letter-spacing:.6px;
+  text-transform:uppercase;cursor:pointer;animation:v-respira 1.5s ease-in-out infinite}
+@keyframes v-respira{0%,100%{box-shadow:0 0 0 0 rgba(0,151,253,.55)}60%{box-shadow:0 0 0 15px rgba(0,151,253,0)}}
+.v-passos{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.v-passos li{display:flex;gap:14px;align-items:flex-start;padding:15px 17px;border-radius:14px;
+  background:var(--noite-2);border:1px solid var(--linha);transition:border-color .3s,background .3s}
+.v-passos li.v-on{border-color:rgba(0,151,253,.55);background:#101A23;box-shadow:0 0 34px rgba(0,151,253,.14)}
+.v-passos li.v-ok{border-color:rgba(60,203,127,.35)}
+.v-passos .v-n{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--mono);font-size:12px;font-weight:600;color:var(--giz-2);
+  background:#0C1016;border:1px solid var(--linha);transition:all .3s}
+.v-passos li.v-on .v-n{background:var(--azul);color:#031726;border-color:var(--azul)}
+.v-passos li.v-ok .v-n{background:rgba(60,203,127,.16);color:var(--ok);border-color:rgba(60,203,127,.4)}
+.v-passos b{display:block;font:600 15.5px var(--texto);color:var(--giz);line-height:1.3}
+.v-passos span{display:block;font-size:13.5px;color:var(--giz-2);line-height:1.5;margin-top:3px}
+.v-impacto{font-family:var(--display);font-weight:900;text-transform:uppercase;
+  font-size:clamp(26px,4vw,40px);line-height:.95;margin:38px 0 0;color:var(--giz)}
+.v-impacto em{font-style:normal;color:var(--azul)}
+.v-nota{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:#5B6872;line-height:1.7;margin:16px 0 0}
+@media(max-width:959px){.v-fone{transform:none}}
+@media(prefers-reduced-motion:reduce){.v-sec *{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -395,6 +540,66 @@ footer{border-top:1px solid var(--linha);padding:20px 0 40px;color:var(--giz-2);
       </div>
     </section>
   </main>
+
+  <!-- --- SECAO VOZ --- -->
+  <section class="v-sec">
+    <svg style="display:none" aria-hidden="true"><symbol id="v-mic" viewBox="0 0 24 24">
+      <rect x="9" y="2.5" width="6" height="11" rx="3" fill="#fff"/>
+      <path d="M5.6 11.2a6.4 6.4 0 0 0 12.8 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+      <path d="M12 17.6V21M8.8 21h6.4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+    </symbol></svg>
+
+    <p class="v-olho"><s></s> Inteligência artificial por voz</p>
+    <h2 class="v-h2">Sua barbearia <em>obedece à sua voz.</em></h2>
+    <p class="v-sub">Esqueça formulário. Abra o painel, toque no microfone e <b>diga o que precisa</b>
+       — agendar, cadastrar cliente, criar serviço. Ela entende, te mostra o que entendeu,
+       e só grava depois que você confirma.</p>
+
+    <div class="v-palco">
+      <div class="v-fone">
+        <div class="v-tela">
+          <div class="v-ilha"></div>
+          <div class="v-app">
+            <div class="v-at">
+              <div class="v-l1"><span class="v-mar"></span><b>Barber <i>IA Pro</i></b></div>
+              <div class="v-l2" id="v-rot">Agenda · hoje</div>
+            </div>
+            <div class="v-ac" id="v-agenda">
+              <div class="v-lin"><span class="v-h">09:00</span><span class="v-q"><b>Pedro Alves</b><span>Corte · Rafael</span></span></div>
+              <div class="v-lin"><span class="v-h">10:30</span><span class="v-q"><b>Caio Mendes</b><span>Corte + Barba · Lucas</span></span></div>
+              <div class="v-lin"><span class="v-h">13:00</span><span class="v-q"><b>Marina Dias</b><span>Barba · Rafael</span></span></div>
+              <div class="v-lin"><span class="v-h">15:30</span><span class="v-q"><b>Bruno Lima</b><span>Corte · Diego</span></span></div>
+            </div>
+          </div>
+          <div class="v-convite" id="v-convite">
+            <b>Faça um teste aqui</b>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 7c7 0 12 3 14.5 8.5"/><path d="M19 9.5v6.5h-6.5"/></svg>
+          </div>
+          <button class="v-fab" id="v-fab" type="button" aria-label="Abrir a caixa de voz">
+            <svg><use href="#v-mic"></use></svg></button>
+          <div class="v-modal" id="v-modal"><div class="v-cx" id="v-cx"></div></div>
+        </div>
+      </div>
+
+      <div>
+        <ul class="v-passos" id="v-passos">
+          <li data-p="1"><span class="v-n">1</span><div><b>Você fala</b>
+            <span>"Agenda um corte para o João hoje às cinco da tarde."</span></div></li>
+          <li data-p="2"><span class="v-n">2</span><div><b>Ela entende</b>
+            <span>Separa cliente, serviço, dia e hora do que você disse.</span></div></li>
+          <li data-p="3"><span class="v-n">3</span><div><b>Você confere</b>
+            <span>Ela mostra campo por campo antes de gravar. Errou? Você corrige ali.</span></div></li>
+          <li data-p="4"><span class="v-n">4</span><div><b>Ela grava</b>
+            <span>O horário entra na agenda na hora, na frente dos seus olhos.</span></div></li>
+        </ul>
+        <p class="v-impacto">Você não precisa digitar.<br><em>É só falar.</em></p>
+        <p class="v-nota">Demonstração — nada é agendado de verdade nesta página.
+           Nomes e horários são exemplo.</p>
+      </div>
+    </div>
+  </section>
 
   <footer>Barber IA Pro · <a href="/termos">Termos</a> · <a href="/privacidade">Privacidade</a></footer>
 </div>
@@ -614,6 +819,100 @@ $('#b-reenviar').addEventListener('click', function(){
   if(f) f.addEventListener('submit', function(){
     if(!r.classList.contains('ver')) abrir();
   }, true);
+})();
+</script>
+<script>
+/* --- SECAO VOZ: a demonstracao ---
+   Imita a caixa de voz do painel (ia-voz.js): abre POR CIMA da agenda,
+   igual ao aparelho, com a tela "Confira se esta tudo certo". No fim a
+   caixa fecha e o horario entra na agenda atras. Nada fala com o
+   backend, e esta escrito na tela. Tudo com prefixo v- para nao
+   encostar no formulario de cadastro. */
+(function(){
+  var cx = document.getElementById('v-cx');
+  if (!cx) return;
+  var modal = document.getElementById('v-modal'),
+      fab = document.getElementById('v-fab'),
+      convite = document.getElementById('v-convite'),
+      rot = document.getElementById('v-rot'),
+      agenda = document.getElementById('v-agenda'),
+      passos = [].slice.call(document.querySelectorAll('#v-passos li'));
+  var FALA = 'Agenda um corte para o João hoje às cinco da tarde.';
+  var CAMPOS = [['Cliente','João Silva'],['Serviço','Corte'],['Data','Hoje'],
+                ['Hora','17:00'],['Barbeiro','Rafael Costa']];
+  var relogios = [];
+  function limpar(){ relogios.forEach(clearTimeout); relogios = []; }
+  function daqui(ms, fn){ relogios.push(setTimeout(fn, ms)); }
+  function marcar(n){
+    passos.forEach(function(li){
+      var p = Number(li.getAttribute('data-p'));
+      li.classList.toggle('v-on', p === n);
+      li.classList.toggle('v-ok', p < n);
+    });
+  }
+  function cabeca(t){
+    cx.innerHTML = '<div class="v-ct"><s></s><b>Barber IA</b><i>' + t + '</i></div>';
+  }
+  fab.addEventListener('click', function(){
+    convite.classList.add('v-some'); modal.classList.add('v-ver'); inicio();
+  });
+  function inicio(){
+    limpar(); marcar(0); rot.textContent = 'Agenda · hoje'; cabeca('toque e fale');
+    cx.insertAdjacentHTML('beforeend',
+      '<button class="v-micg" id="v-micg" type="button" aria-label="Falar">' +
+      '<svg><use href="#v-mic"></use></svg></button>' +
+      '<p class="v-dica">Toque e diga o que precisa.<br><b>É esta a tela do seu painel.</b></p>');
+    document.getElementById('v-micg').addEventListener('click', gravando);
+  }
+  function gravando(){
+    marcar(1); rot.textContent = 'gravando…'; cabeca('gravando');
+    var barras = '';
+    for (var i = 0; i < 15; i++) barras += '<i style="animation-delay:' + (i*47) + 'ms"></i>';
+    cx.insertAdjacentHTML('beforeend',
+      '<div class="v-onda">' + barras + '</div><p class="v-falando" id="v-fala"></p>');
+    var el = document.getElementById('v-fala'), i = 0;
+    (function escreve(){
+      if (i <= FALA.length){ el.textContent = FALA.slice(0, i++); daqui(33, escreve); }
+      else { el.className = 'v-falando v-fim'; daqui(500, pensando); }
+    })();
+  }
+  function pensando(){
+    marcar(2); rot.textContent = 'entendendo…'; cabeca('entendendo');
+    cx.insertAdjacentHTML('beforeend',
+      '<div class="v-pensa"><div class="v-aro"></div>' +
+      '<p class="v-dica" style="margin:0">Separando cliente, serviço,<br>dia e hora.</p></div>');
+    daqui(1200, conferir);
+  }
+  function conferir(){
+    marcar(3); rot.textContent = 'confira'; cabeca('confira');
+    var h = '<p class="v-voce">Você falou: <span>' + FALA + '</span></p>' +
+            '<p class="v-tit">Confira se está tudo certo</p><div class="v-campos">';
+    CAMPOS.forEach(function(c){
+      h += '<div class="v-ln"><u>' + c[0] + '</u><b>' + c[1] + '</b></div>';
+    });
+    h += '</div><button class="v-pronto" id="v-ok" type="button">Pronto</button>';
+    cx.insertAdjacentHTML('beforeend', h);
+    [].slice.call(cx.querySelectorAll('.v-ln')).forEach(function(ln, i){
+      daqui(105 * i, function(){ ln.classList.add('v-ver'); });
+    });
+    document.getElementById('v-ok').addEventListener('click', gravar);
+  }
+  function gravar(){
+    limpar(); marcar(4); modal.classList.remove('v-ver'); rot.textContent = 'Agenda · hoje';
+    daqui(260, function(){
+      if (agenda.querySelector('.v-nova')) return;
+      var nova = document.createElement('div');
+      nova.className = 'v-lin v-nova';
+      nova.innerHTML = '<span class="v-h">17:00</span><span class="v-q">' +
+                       '<b>João Silva</b><span>Corte · Rafael</span></span>';
+      agenda.appendChild(nova);
+      passos.forEach(function(li){ li.classList.add('v-ok'); li.classList.remove('v-on'); });
+      daqui(2600, function(){
+        convite.classList.remove('v-some');
+        convite.querySelector('b').textContent = 'Toque de novo';
+      });
+    });
+  }
 })();
 </script>
 </body>
